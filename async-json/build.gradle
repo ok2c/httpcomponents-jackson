@@ -1,0 +1,13 @@
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+dependencies {
+
+    compile libraries.httpclient
+    compile libraries.jackson
+    testCompile libraries.junit
+    testCompile libraries.hamcrest
+    testCompile libraries.slf4jimpl
+
+}
