@@ -6,12 +6,14 @@ ext {
     libraries = [:]
 }
 
+versions.httpcore = '5.0-beta6'
 versions.httpclient = '5.0-beta3'
 versions.jackson = '2.9.6'
 versions.junit = '4.12'
 versions.hamcrest = '1.3'
 versions.slf4j = '1.7.25'
 
+libraries.httpcore = "org.apache.httpcomponents.core5:httpcore5:${versions.httpcore}"
 libraries.httpclient = "org.apache.httpcomponents.client5:httpclient5:${versions.httpclient}"
 libraries.jackson = "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}"
 libraries.junit = "junit:junit:${versions.junit}"
