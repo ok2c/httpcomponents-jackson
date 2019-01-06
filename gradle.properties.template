@@ -1,0 +1,6 @@
+signing.keyId =
+signing.password =
+signing.secretKeyRingFile = $HOME/.gnupg/secring.gpg
+
+ossrh.user=
+ossrh.password=
