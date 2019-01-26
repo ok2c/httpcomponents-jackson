@@ -46,7 +46,7 @@ abstract class AbstractJsonEntityConsumer<T> implements AsyncEntityConsumer<T> {
         this.resultRef = new AtomicReference<>(null);
     }
 
-    protected abstract JsonTokenConsumer createJsonTokenConsumer(Consumer<T> resultConsumer);
+    abstract JsonTokenConsumer createJsonTokenConsumer(Consumer<T> resultConsumer);
 
     @Override
     public final void streamStart(EntityDetails entityDetails, FutureCallback<T> resultCallback) throws HttpException, IOException {

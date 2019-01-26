@@ -16,7 +16,6 @@
 package com.ok2c.hc5.json.http;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import org.apache.hc.core5.util.Args;
@@ -28,7 +27,7 @@ import com.ok2c.hc5.json.TokenBufferAssembler;
 
 /**
  * {@link org.apache.hc.core5.http.nio.AsyncEntityConsumer} implementation that
- * converts incoming HTTP message entity into an instance of the given class.
+ * de-serializes incoming HTTP message entity into an instance of the given class.
  *
  * @param <T> type of objects produced by this class.
  */

@@ -31,14 +31,16 @@ import org.apache.hc.core5.http.nio.AsyncDataConsumer;
 import org.apache.hc.core5.http.nio.AsyncEntityConsumer;
 import org.apache.hc.core5.http.nio.CapacityChannel;
 
+import com.ok2c.hc5.json.JsonConsumer;
+
 class JsonStreamConsumer<H extends HttpMessage, T> implements AsyncDataConsumer {
 
     private final Supplier<AsyncEntityConsumer<T>> entityConsumerSupplier;
-    private final HttpMessageConsumer<H> messageConsumer;
+    private final JsonConsumer<H> messageConsumer;
     private final AtomicReference<AsyncEntityConsumer<T>> entityConsumerRef;
 
     public JsonStreamConsumer(Supplier<AsyncEntityConsumer<T>> entityConsumerSupplier,
-                              HttpMessageConsumer<H> messageConsumer) {
+                              JsonConsumer<H> messageConsumer) {
         this.entityConsumerSupplier = entityConsumerSupplier;
         this.messageConsumer = messageConsumer;
         this.entityConsumerRef = new AtomicReference<>();

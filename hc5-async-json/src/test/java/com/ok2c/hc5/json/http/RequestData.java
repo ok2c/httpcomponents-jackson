@@ -17,13 +17,13 @@ package com.ok2c.hc5.json.http;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.http.message.BasicHeader;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class RequestData {
 
@@ -32,6 +32,8 @@ public class RequestData {
     private String origin;
     private Map<String, String> headers;
     private Map<String, String> args;
+    private String data;
+    private JsonNode json;
 
     public int getId() {
         return id;
@@ -78,6 +80,22 @@ public class RequestData {
         this.args = args;
     }
 
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public JsonNode getJson() {
+        return json;
+    }
+
+    public void setJson(JsonNode json) {
+        this.json = json;
+    }
+
     @Override
     public String toString() {
         return "RequestData{" +
@@ -86,6 +104,8 @@ public class RequestData {
                 ", origin='" + origin + '\'' +
                 ", headers=" + headers +
                 ", args=" + args +
+                ", data='" + data + '\'' +
+                ", json=" + json +
                 '}';
     }
 

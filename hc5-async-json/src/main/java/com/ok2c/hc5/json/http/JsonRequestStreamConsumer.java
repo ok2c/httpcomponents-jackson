@@ -26,10 +26,12 @@ import org.apache.hc.core5.http.nio.AsyncEntityConsumer;
 import org.apache.hc.core5.http.nio.AsyncRequestConsumer;
 import org.apache.hc.core5.http.protocol.HttpContext;
 
+import com.ok2c.hc5.json.JsonConsumer;
+
 final class JsonRequestStreamConsumer<T> extends JsonStreamConsumer<HttpRequest, T> implements AsyncRequestConsumer<T> {
 
     public JsonRequestStreamConsumer(Supplier<AsyncEntityConsumer<T>> consumerSupplier,
-                                     HttpMessageConsumer<HttpRequest> messageConsumer) {
+                                     JsonConsumer<HttpRequest> messageConsumer) {
         super(consumerSupplier, messageConsumer);
     }
 

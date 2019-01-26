@@ -24,7 +24,7 @@ import com.ok2c.hc5.json.JsonTokenConsumer;
 
 /**
  * {@link org.apache.hc.core5.http.nio.AsyncEntityConsumer} implementation that
- * converts incoming HTTP message entity into an {@link JsonNode} instance.
+ * de-serializes incoming HTTP message entity into an {@link JsonNode} instance.
  */
 public class JsonNodeEntityConsumer extends AbstractJsonEntityConsumer<JsonNode> {
 

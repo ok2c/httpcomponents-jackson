@@ -22,6 +22,7 @@ import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ok2c.hc5.json.JsonConsumer;
 import com.ok2c.hc5.json.JsonResultSink;
 import com.ok2c.hc5.json.JsonTokenEventHandler;
 
@@ -69,7 +70,7 @@ public final class JsonResponseConsumers {
      */
     public static <T> AsyncResponseConsumer<Long> create(ObjectMapper objectMapper,
                                                          Class<T> objectClazz,
-                                                         HttpMessageConsumer<HttpResponse> messageConsumer,
+                                                         JsonConsumer<HttpResponse> messageConsumer,
                                                          JsonResultSink<T> resultSink) {
         return new JsonResponseStreamConsumer<>(
                 () -> new JsonSequenceEntityConsumer<>(objectMapper, objectClazz, resultSink),
@@ -86,7 +87,7 @@ public final class JsonResponseConsumers {
      * @return the response consumer.
      */
     public static AsyncResponseConsumer<Void> create(JsonFactory jsonFactory,
-                                                     HttpMessageConsumer<HttpResponse> messageConsumer,
+                                                     JsonConsumer<HttpResponse> messageConsumer,
                                                      JsonTokenEventHandler eventHandler) {
         return new JsonResponseStreamConsumer<>(
                 () -> new JsonTokenEntityConsumer(jsonFactory, eventHandler),
