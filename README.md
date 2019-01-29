@@ -21,10 +21,10 @@ a higher level Java object model.
 There are several `AsyncResponseConsumer` implementations provided by the library that can be 
 created using `JsonResponseConsumers` factory class.
 
-1. Request data consumers that convert JSON messages into an object or multiple objects of the same 
-class using Jackson's `ObjectMapper`
+1. Response data consumers that convert HTTP messages with enclosed JSON content into an object or 
+multiple objects of the same class using Jackson's `ObjectMapper`
 
-    * Single data object
+    * Single data or `JsonNode` object
      
     ```java
     CloseableHttpAsyncClient client = HttpAsyncClients.createSystem();
@@ -122,53 +122,7 @@ class using Jackson's `ObjectMapper`
     Objects received: 5
     ``` 
 
-2. Request data consumer that converts JSON messages into a `JsonNode` object
-
-    ```java
-    CloseableHttpAsyncClient client = HttpAsyncClients.createSystem();
-    
-    client.start();
-    
-    URI uri = URI.create("http://httpbin.org/get");
-    
-    JsonFactory factory = new JsonFactory();
-    System.out.println("Executing GET " + uri);
-    Future<?> future = client.execute(
-            AsyncRequestBuilder.get(uri).build(),
-            JsonResponseConsumers.create(factory),
-            new FutureCallback<Message<HttpResponse, JsonNode>>() {
-    
-                @Override
-                public void completed(Message<HttpResponse, JsonNode> message) {
-                    System.out.println("Response status: " + message.getHead().getCode());
-                    System.out.println(message.getBody());
-                }
-    
-                @Override
-                public void failed(Exception ex) {
-                    ex.printStackTrace(System.out);
-                }
-    
-                @Override
-                public void cancelled() {
-                }
-    
-            });
-    future.get();
-    
-    client.shutdown(CloseMode.GRACEFUL);
-    
-    ```
-     
-    Stdout>
-    ```
-    Executing GET http://httpbin.org/get
-    Shutting down
-    Response status: 200
-    {"args":{},"headers":{"Connection":"close","Host":"httpbin.org","User-Agent":"Apache-HttpAsyncClient/5.0-beta3 (Java/1.8.0_181)"},"origin":"xxx.xxx.xxx.xxx","url":"http://httpbin.org/get"}
-    ``` 
-
-3. Request data consumer that converts JSON messages a sequence of token evens. This is the most efficient way of 
+1. Request data consumer that converts JSON messages a sequence of token evens. This is the most efficient way of 
 processing JSON content supported by the library. It enables partial consumption of JSON structure without creating
 a full representation of incoming messages.
 
@@ -278,3 +232,115 @@ a full representation of incoming messages.
     object start/args=object start/object end/headers=object start/Connection="close"/Host="httpbin.org"/User-Agent="Apache-HttpAsyncClient/5.0-beta3 (Java/1.8.0_181)"/object end/origin="xxx.xxx.xxx.xxx"/url="http://httpbin.org/get"/object end/stream end/
     Object received
     ```
+
+## HTTP request message producers
+
+There are several `AsyncRequestProducer` implementations provided by the library that can be 
+created using `JsonRequestProducers` factory class.
+
+1. Request producers that generate HTTP request messages with enclosed JSON content from a single JSON object 
+or multiple JSON objects of the same class using Jackson's `ObjectMapper`
+
+    * Single data or `JsonNode` object
+     
+    ```java
+    CloseableHttpAsyncClient client = HttpAsyncClients.createSystem();
+
+    client.start();
+
+    URI uri = URI.create("http://httpbin.org/post");
+
+    JsonFactory factory = new JsonFactory();
+    ObjectMapper objectMapper = new ObjectMapper(factory);
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    System.out.println("Executing POST " + uri);
+    Future<?> future = client.execute(
+            JsonRequestProducers.create(HttpRequests.POST.create(uri),
+                    new BasicNameValuePair("name", "value"), objectMapper),
+            JsonResponseConsumers.create(objectMapper, RequestData.class),
+            new FutureCallback<Message<HttpResponse, RequestData>>() {
+
+                @Override
+                public void completed(Message<HttpResponse, RequestData> message) {
+                    System.out.println("Response status: " + message.getHead().getCode());
+                    System.out.println(message.getBody());
+                }
+
+                @Override
+                public void failed(Exception ex) {
+                    ex.printStackTrace(System.out);
+                }
+
+                @Override
+                public void cancelled() {
+                }
+
+            });
+    future.get();
+
+    client.shutdown(CloseMode.GRACEFUL);
+    ```
+    
+    Stdout>
+    ```
+    Executing POST http://httpbin.org/post
+    Response status: 200
+    RequestData{id=0, url=http://httpbin.org/post, origin='xxx.xxx.xxx.xxx', headers={Connection=close, Content-Type=application/json; charset=UTF-8, Host=httpbin.org, Transfer-Encoding=chunked, User-Agent=Apache-HttpAsyncClient/5.0-beta3 (Java/1.8.0_181)}, args={}, data='{"name":"name","value":"value"}', json={"name":"name","value":"value"}}
+    ```
+    
+    * Sequence of data objects of the same class
+    
+    The `ObjectChannel` passed to the message producer is fully threading safe and can be used concurrently 
+    by worker threads to generate and submit JSON objects to the channel asynchronously as more data become 
+    available.
+
+    ```java
+    CloseableHttpAsyncClient client = HttpAsyncClients.createSystem();
+
+    client.start();
+
+    URI uri = URI.create("http://httpbin.org/post");
+
+    JsonFactory factory = new JsonFactory();
+    ObjectMapper objectMapper = new ObjectMapper(factory);
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    System.out.println("Executing POST " + uri);
+    Future<?> future = client.execute(
+            JsonRequestProducers.create(HttpRequests.POST.create(uri),
+                    objectMapper,
+                    channel -> {
+                        channel.write(new BasicNameValuePair("name1", "value1"));
+                        channel.write(new BasicNameValuePair("name2", "value2"));
+                        channel.write(new BasicNameValuePair("name3", "value3"));
+                        channel.endStream();
+                    }),
+            JsonResponseConsumers.create(objectMapper, RequestData.class),
+            new FutureCallback<Message<HttpResponse, RequestData>>() {
+
+                @Override
+                public void completed(Message<HttpResponse, RequestData> message) {
+                    System.out.println("Response status: " + message.getHead().getCode());
+                    System.out.println(message.getBody());
+                }
+
+                @Override
+                public void failed(Exception ex) {
+                    ex.printStackTrace(System.out);
+                }
+
+                @Override
+                public void cancelled() {
+                }
+
+            });
+    future.get();
+
+    client.shutdown(CloseMode.GRACEFUL);
+    ```
+    
+    Stdout>
+    ```
+    Response status: 200
+    Shutting down
+    RequestData{id=0, url=http://httpbin.org/post, origin='xxx.xxx.xxx.xxx', headers={Connection=close, Content-Type=application/json; charset=UTF-8, Host=httpbin.org, Transfer-Encoding=chunked, User-Agent=Apache-HttpAsyncClient/5.0-beta3 (Java/1.8.0_181)}, args={}, data='{"name":"name1","value":"value1"}{"name":"name2","value":"value2"}{"name":"name3","value":"value3"}', json=null}
+    ``` 
