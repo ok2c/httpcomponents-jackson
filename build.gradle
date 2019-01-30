@@ -64,10 +64,20 @@ subprojects {
                 artifact sourcesJar
 
                 pom {
+                    name = "JSON for Apache HC 5.0"
+                    description = 'Asynchronous JSON message processors for Apache HttpComponents 5.0'
+                    url = 'https://github.com/ok2c/httpcomponents-jackson'
                     licenses {
                         license {
                             name = 'The Apache License, Version 2.0'
                             url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'ok2c'
+                            name = 'Oleg Kalnichevski'
+                            email = 'olegk@apache.org'
                         }
                     }
                     scm {
