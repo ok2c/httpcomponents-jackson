@@ -20,7 +20,7 @@ libraries.slf4jimpl = "org.slf4j:slf4j-simple:${versions.slf4j}"
 allprojects {
 
     group 'com.github.ok2c.hc5'
-    version '0.1.0-SNAPSHOT'
+    version '0.1.0'
 
     ext.releaseVersion = !version.endsWith("-SNAPSHOT")
 
