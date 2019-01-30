@@ -16,6 +16,15 @@ The library uses the asynchronous JSON message parser of the fantastic
 [Jackson JSON processor](https://github.com/FasterXML/jackson) to tokenize JSON content and map onto
 a higher level Java object model.
 
+The library is available in Maven Central with the following coordinates:
+
+```xml
+<dependency>
+  <groupId>com.github.ok2c.hc5</groupId>
+  <artifactId>hc5-async-json</artifactId>
+  <version>0.1.0</version>
+</dependency>
+```
 ## HTTP response message consumers
 
 There are several `AsyncResponseConsumer` implementations provided by the library that can be 
