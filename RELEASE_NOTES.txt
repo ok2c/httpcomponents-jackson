@@ -1,0 +1,15 @@
+Release 0.1.1
+-------------------
+
+This is a bug fix release that fixes one defect found in version 0.1.0
+
+Change log:
+-------------------
+
+* Bug fix: JsonAsyncTokenizer#consume method does not take into account position and limit of ByteBuffer
+  backed by a byte array.
+
+Release 0.1.0
+-------------------
+
+Initial release of Asynchronous JSON message processors for Apache HttpComponents 5.0
