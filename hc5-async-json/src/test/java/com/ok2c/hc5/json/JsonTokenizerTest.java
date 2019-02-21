@@ -28,6 +28,9 @@ import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonTokenizerTest {
 
@@ -437,6 +440,51 @@ public class JsonTokenizerTest {
                     JsonTokenId.ID_NO_TOKEN
             ));
         }
+    }
+
+    @Test
+    public void testConsumePartial() throws Exception {
+        JsonFactory factory = new JsonFactory();
+        JsonAsyncTokenizer jsonTokenizer = new JsonAsyncTokenizer(factory);
+
+        ByteBuffer b1 = ByteBuffer.wrap(new byte[]{0, 0, 0, '{', '"', 'n', 'a', 'm', 0, 0, 0}, 3, 5);
+        ByteBuffer b2 = ByteBuffer.wrap(new byte[]{0, 0, 'e', '"', ' ', ' ', ':', ' ', 0}, 2, 6);
+        ByteBuffer b3 = ByteBuffer.wrap(new byte[]{0, 0, 0, 0, '"', 'v', 'a', 'l', 'u', 'e', '"', ' ', ' ', '}'}, 4, 10);
+
+        List<Integer> tokens1 = new ArrayList<>();
+        jsonTokenizer.initialize((tokenId, jsonParser) -> tokens1.add(tokenId));
+
+        jsonTokenizer.consume(b1);
+        jsonTokenizer.consume(b2);
+        jsonTokenizer.consume(b3);
+        jsonTokenizer.streamEnd();
+
+        Assert.assertThat(tokens1, Matchers.contains(
+                JsonTokenId.ID_START_OBJECT,
+                JsonTokenId.ID_FIELD_NAME,
+                JsonTokenId.ID_STRING,
+                JsonTokenId.ID_END_OBJECT,
+                JsonTokenId.ID_NO_TOKEN
+        ));
+
+        List<Integer> tokens2 = new ArrayList<>();
+        jsonTokenizer.initialize((tokenId, jsonParser) -> tokens2.add(tokenId));
+
+        ByteBuffer b4 = ByteBuffer.wrap(new byte[]{0, 0, 0, '{', '"', 'n', 'a', 'm', 0, 0, 0}, 3, 5).slice();
+        ByteBuffer b5 = ByteBuffer.wrap(new byte[]{0, 0, 'e', '"', ' ', ' ', ':', ' ', 0}, 2, 6).slice();
+        ByteBuffer b6 = ByteBuffer.wrap(new byte[]{0, 0, 0, 0, '"', 'v', 'a', 'l', 'u', 'e', '"', ' ', ' ', '}'}, 4, 10).slice();
+        jsonTokenizer.consume(b4);
+        jsonTokenizer.consume(b5);
+        jsonTokenizer.consume(b6);
+        jsonTokenizer.streamEnd();
+
+        Assert.assertThat(tokens2, Matchers.contains(
+                JsonTokenId.ID_START_OBJECT,
+                JsonTokenId.ID_FIELD_NAME,
+                JsonTokenId.ID_STRING,
+                JsonTokenId.ID_END_OBJECT,
+                JsonTokenId.ID_NO_TOKEN
+        ));
     }
 
 }

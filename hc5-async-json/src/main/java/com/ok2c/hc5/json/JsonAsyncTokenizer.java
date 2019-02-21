@@ -78,7 +78,9 @@ public final class JsonAsyncTokenizer {
             return;
         }
         if (data.hasArray()) {
-            inputFeeder.feedInput(data.array(), data.arrayOffset(), data.remaining());
+            int off = data.arrayOffset();
+            inputFeeder.feedInput(data.array(), off + data.position(), off + data.limit());
+            data.position(data.limit());
         } else {
             byte[] tmp = new byte[data.remaining()];
             data.get(tmp);
