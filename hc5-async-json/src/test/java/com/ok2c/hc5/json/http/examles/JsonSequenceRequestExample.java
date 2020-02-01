@@ -18,7 +18,7 @@ package com.ok2c.hc5.json.http.examles;
 import java.net.URI;
 import java.util.concurrent.Future;
 
-import org.apache.hc.client5.http.async.methods.HttpRequests;
+import org.apache.hc.client5.http.async.methods.BasicHttpRequests;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.core5.concurrent.FutureCallback;
@@ -48,7 +48,7 @@ public class JsonSequenceRequestExample {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         System.out.println("Executing POST " + uri);
         Future<?> future = client.execute(
-                JsonRequestProducers.create(HttpRequests.POST.create(uri),
+                JsonRequestProducers.create(BasicHttpRequests.post(uri),
                         objectMapper,
                         channel -> {
                             channel.write(new BasicNameValuePair("name1", "value1"));
@@ -78,7 +78,7 @@ public class JsonSequenceRequestExample {
         future.get();
 
         System.out.println("Shutting down");
-        client.shutdown(CloseMode.GRACEFUL);
+        client.close(CloseMode.GRACEFUL);
     }
 
 }

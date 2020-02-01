@@ -127,7 +127,7 @@ public class JsonTokenEventResponseExample {
         future.get();
 
         System.out.println("Shutting down");
-        client.shutdown(CloseMode.GRACEFUL);
+        client.close(CloseMode.GRACEFUL);
     }
 
 }

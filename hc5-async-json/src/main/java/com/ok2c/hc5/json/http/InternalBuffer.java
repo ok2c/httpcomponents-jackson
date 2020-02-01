@@ -43,6 +43,15 @@ class InternalBuffer extends ExpandableBuffer {
         buffer().put((byte) b);
     }
 
+    @Override
+    protected int length() {
+        return super.length();
+    }
+
+    @Override
+    protected boolean hasData() {
+        return super.hasData();
+    }
 
     @Override
     public void clear() {
