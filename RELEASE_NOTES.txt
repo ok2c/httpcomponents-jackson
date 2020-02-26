@@ -1,3 +1,9 @@
+Release 0.2.0
+-------------------
+
+This is a minor release that upgrades HttpCore and HttpClient dependencies
+to 5.0 GA.
+
 Release 0.1.1
 -------------------
 
