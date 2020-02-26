@@ -1,3 +1,2 @@
 rootProject.name = 'httpcomponents-jackson'
 include 'hc5-async-json'
-enableFeaturePreview('STABLE_PUBLISHING')

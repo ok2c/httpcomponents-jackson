@@ -3,8 +3,8 @@ ext {
     libraries = [:]
 }
 
-versions.httpcore = '5.0-beta11'
-versions.httpclient = '5.0-beta7'
+versions.httpcore = '5.0'
+versions.httpclient = '5.0'
 versions.jackson = '2.9.6'
 versions.junit = '4.12'
 versions.hamcrest = '1.3'
