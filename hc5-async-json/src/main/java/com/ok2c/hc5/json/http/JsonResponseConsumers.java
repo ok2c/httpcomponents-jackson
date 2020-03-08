@@ -15,6 +15,7 @@
  */
 package com.ok2c.hc5.json.http;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.Message;
 import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
@@ -47,6 +48,20 @@ public final class JsonResponseConsumers {
 
     /**
      * Creates {@link AsyncResponseConsumer} that produces a {@link Message} object
+     * consisting of the {@link HttpResponse} head and the de-serialized JSON body.
+     *
+     * @param objectMapper the object mapper to be used to de-serialize JSON content.
+     * @param typeReference the type reference of the de-serialized object.
+     * @param <T> the type of result objects produced by the consumer.
+     * @return the response consumer.
+     */
+    public static <T> AsyncResponseConsumer<Message<HttpResponse, T>> create(ObjectMapper objectMapper,
+            TypeReference<T> typeReference) {
+        return new JsonResponseObjectConsumer<>(() -> new JsonObjectEntityConsumer<>(objectMapper, typeReference));
+    }
+
+    /**
+     * Creates {@link AsyncResponseConsumer} that produces a {@link Message} object
      * consisting of the {@link HttpResponse} head and the {@link JsonNode} body.
      *
      * @param jsonFactory JSON factory.
@@ -74,6 +89,27 @@ public final class JsonResponseConsumers {
                                                          JsonResultSink<T> resultSink) {
         return new JsonResponseStreamConsumer<>(
                 () -> new JsonSequenceEntityConsumer<>(objectMapper, objectClazz, resultSink),
+                messageConsumer);
+    }
+
+    /**
+     * Creates {@link AsyncResponseConsumer} that converts incoming HTTP message
+     * into a sequence of instances of the given class and passes those objects
+     * to the given {@link JsonResultSink}.
+     *
+     * @param objectMapper the object mapper to be used to de-serialize JSON content.
+     * @param typeReference the type reference of the de-serialized object.
+     * @param messageConsumer optional operation that accepts the message head as input.
+     * @param resultSink the recipient of result objects.
+     * @param <T> type of result objects produced by the consumer.
+     * @return the response consumer.
+     */
+    public static <T> AsyncResponseConsumer<Long> create(ObjectMapper objectMapper,
+            TypeReference<T> typeReference,
+            JsonConsumer<HttpResponse> messageConsumer,
+            JsonResultSink<T> resultSink) {
+        return new JsonResponseStreamConsumer<>(
+                () -> new JsonSequenceEntityConsumer<>(objectMapper, typeReference, resultSink),
                 messageConsumer);
     }
 

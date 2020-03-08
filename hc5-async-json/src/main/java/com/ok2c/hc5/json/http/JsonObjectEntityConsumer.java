@@ -18,6 +18,7 @@ package com.ok2c.hc5.json.http;
 import java.io.IOException;
 import java.util.function.Consumer;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.hc.core5.util.Args;
 
 import com.fasterxml.jackson.core.JsonParser;
@@ -33,13 +34,16 @@ import com.ok2c.hc5.json.TokenBufferAssembler;
  */
 public class JsonObjectEntityConsumer<T> extends AbstractJsonEntityConsumer<T> {
 
-    private final ObjectMapper objectMapper;
-    private final Class<T> objectClazz;
+    private final ReadJsonValue<T> readJsonValue;
 
     public JsonObjectEntityConsumer(ObjectMapper objectMapper, Class<T> objectClazz) {
         super(Args.notNull(objectMapper, "Object mapper").getFactory());
-        this.objectMapper = objectMapper;
-        this.objectClazz = objectClazz;
+        this.readJsonValue = jsonParser -> objectMapper.readValue(jsonParser, objectClazz);
+    }
+
+    public JsonObjectEntityConsumer(ObjectMapper objectMapper, TypeReference<T> typeReference) {
+        super(Args.notNull(objectMapper, "Object mapper").getFactory());
+        this.readJsonValue = jsonParser -> objectMapper.readValue(jsonParser, typeReference);
     }
 
     @Override
@@ -47,7 +51,7 @@ public class JsonObjectEntityConsumer<T> extends AbstractJsonEntityConsumer<T> {
         return new TokenBufferAssembler(tokenBuffer -> {
             try {
                 JsonParser jsonParser = tokenBuffer != null ? tokenBuffer.asParserOnFirstToken() : null;
-                T result = jsonParser != null ? objectMapper.readValue(jsonParser, objectClazz) : null;
+                T result = jsonParser != null ? readJsonValue.readValue(jsonParser) : null;
                 resultConsumer.accept(result);
             } catch (IOException ex) {
                 failed(ex);
@@ -55,4 +59,8 @@ public class JsonObjectEntityConsumer<T> extends AbstractJsonEntityConsumer<T> {
         });
     }
 
+    @FunctionalInterface
+    private interface ReadJsonValue<T> {
+        T readValue(JsonParser jsonParser) throws IOException;
+    }
 }

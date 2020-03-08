@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.hc.core5.util.Args;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,15 +38,20 @@ import com.ok2c.hc5.json.TokenBufferAssembler;
  */
 public class JsonSequenceEntityConsumer<T> extends AbstractJsonEntityConsumer<Long> {
 
-    private final ObjectMapper objectMapper;
-    private final Class<T> objectClazz;
+    private final ReadJsonValue<T> readJsonValue;
     private final JsonResultSink<T> resultSink;
     private final AtomicLong count;
 
     public JsonSequenceEntityConsumer(ObjectMapper objectMapper, Class<T> objectClazz, JsonResultSink<T> resultSink) {
         super(Args.notNull(objectMapper, "Object mapper").getFactory());
-        this.objectMapper = objectMapper;
-        this.objectClazz = objectClazz;
+        this.readJsonValue = jsonParser -> objectMapper.readValue(jsonParser, objectClazz);
+        this.resultSink = Args.notNull(resultSink, "Result sink");
+        this.count = new AtomicLong(0);
+    }
+
+    public JsonSequenceEntityConsumer(ObjectMapper objectMapper, TypeReference<T> typeReference, JsonResultSink<T> resultSink) {
+        super(Args.notNull(objectMapper, "Object mapper").getFactory());
+        this.readJsonValue = jsonParser -> objectMapper.readValue(jsonParser, typeReference);
         this.resultSink = Args.notNull(resultSink, "Result sink");
         this.count = new AtomicLong(0);
     }
@@ -62,7 +69,8 @@ public class JsonSequenceEntityConsumer<T> extends AbstractJsonEntityConsumer<Lo
             @Override
             public void accept(TokenBuffer tokenBuffer) {
                 try {
-                    T result = tokenBuffer != null ? objectMapper.readValue(tokenBuffer.asParserOnFirstToken(), objectClazz) : null;
+                    JsonParser jsonParser = tokenBuffer != null ? tokenBuffer.asParserOnFirstToken() : null;
+                    T result = jsonParser != null ? readJsonValue.readValue(jsonParser) : null;
                     if (result != null) {
                         count.incrementAndGet();
                         resultSink.accept(result);
@@ -81,4 +89,8 @@ public class JsonSequenceEntityConsumer<T> extends AbstractJsonEntityConsumer<Lo
         });
     }
 
+    @FunctionalInterface
+    private interface ReadJsonValue<T> {
+        T readValue(JsonParser jsonParser) throws IOException;
+    }
 }
