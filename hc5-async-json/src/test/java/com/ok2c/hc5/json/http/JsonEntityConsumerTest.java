@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.impl.BasicEntityDetails;
@@ -155,6 +156,46 @@ public class JsonEntityConsumerTest {
     }
 
     @Test
+    public void testJsonTypeReferenceEntityConsumer() throws Exception {
+        JsonFactory factory = new JsonFactory();
+        ObjectMapper objectMapper = new ObjectMapper(factory);
+
+        URL resource = getClass().getResource("/sample4.json");
+        Assert.assertThat(resource, CoreMatchers.notNullValue());
+
+        AtomicReference<List<String>> resultRef = new AtomicReference<>();
+        JsonObjectEntityConsumer<List<String>> entityConsumer = new JsonObjectEntityConsumer<>(objectMapper, new TypeReference<List<String>>() { });
+        try (InputStream inputStream = resource.openStream()) {
+            entityConsumer.streamStart(
+                    new BasicEntityDetails(-1, ContentType.APPLICATION_JSON),
+                    new FutureCallback<List<String>>() {
+
+                        @Override
+                        public void completed(List<String> result) {
+                            resultRef.set(result);
+                        }
+
+                        @Override
+                        public void failed(Exception ex) {
+                        }
+
+                        @Override
+                        public void cancelled() {
+                        }
+
+                    });
+            byte[] bytebuf = new byte[1024];
+            int len;
+            while ((len = inputStream.read(bytebuf)) != -1) {
+                entityConsumer.consume(ByteBuffer.wrap(bytebuf, 0, len));
+            }
+            entityConsumer.streamEnd(null);
+        }
+
+        Assert.assertThat(resultRef.get(), Matchers.contains("1", "2", "3", "4"));
+    }
+
+    @Test
     public void testJsonSequenceEntityConsumer() throws Exception {
         JsonFactory factory = new JsonFactory();
         ObjectMapper objectMapper = new ObjectMapper(factory);
@@ -277,6 +318,77 @@ public class JsonEntityConsumerTest {
         expectedObject3.setOrigin("xxx.xxx.xxx.xxx");
 
         Assert.assertThat(jsonDataList.get(2), Matchers.samePropertyValuesAs(expectedObject3));
+    }
+
+    @Test
+    public void testJsonTypeReferenceSequenceEntityConsumer() throws Exception {
+        JsonFactory factory = new JsonFactory();
+        ObjectMapper objectMapper = new ObjectMapper(factory);
+
+        URL resource = getClass().getResource("/sample5.json");
+        Assert.assertThat(resource, CoreMatchers.notNullValue());
+
+        AtomicReference<Long> resultRef = new AtomicReference<>();
+        AtomicInteger started = new AtomicInteger(0);
+        List<List<String>> jsonDataList = new ArrayList<>();
+        AtomicInteger ended = new AtomicInteger(0);
+        JsonSequenceEntityConsumer<List<String>> entityConsumer = new JsonSequenceEntityConsumer<>(
+                objectMapper,
+                new TypeReference<List<String>>() { },
+                new JsonResultSink<List<String>>() {
+
+                    @Override
+                    public void begin(int sizeHint) {
+                        started.incrementAndGet();
+                    }
+
+                    @Override
+                    public void accept(List<String> data) {
+                        jsonDataList.add(data);
+                    }
+
+                    @Override
+                    public void end() {
+                        ended.incrementAndGet();
+                    }
+
+                });
+        try (InputStream inputStream = resource.openStream()) {
+            entityConsumer.streamStart(
+                    new BasicEntityDetails(-1, ContentType.APPLICATION_JSON),
+                    new FutureCallback<Long>() {
+
+                        @Override
+                        public void completed(Long result) {
+                            resultRef.set(result);
+                        }
+
+                        @Override
+                        public void failed(Exception ex) {
+                        }
+
+                        @Override
+                        public void cancelled() {
+                        }
+
+                    });
+            byte[] bytebuf = new byte[1024];
+            int len;
+            while ((len = inputStream.read(bytebuf)) != -1) {
+                entityConsumer.consume(ByteBuffer.wrap(bytebuf, 0, len));
+            }
+            entityConsumer.streamEnd(null);
+        }
+
+        Assert.assertThat(resultRef.get(), Matchers.equalTo(3L));
+
+        Assert.assertThat(jsonDataList, Matchers.hasSize(3));
+        Assert.assertThat(started.get(), Matchers.equalTo(1));
+        Assert.assertThat(ended.get(), Matchers.equalTo(1));
+
+        Assert.assertThat(jsonDataList.get(0), Matchers.contains("1", "2", "3", "4"));
+        Assert.assertThat(jsonDataList.get(1), Matchers.contains("5", "6", "7", "8"));
+        Assert.assertThat(jsonDataList.get(2), Matchers.contains("9", "10", "11", "12"));
     }
 
 }
