@@ -56,14 +56,14 @@ class JsonMessageConsumer<H extends HttpMessage, T> implements AsyncDataConsumer
             return;
         }
         ContentType contentType = ContentType.parseLenient(entityDetails.getContentType());
-        if (contentType != null &&
-                ContentType.APPLICATION_JSON.getMimeType().equalsIgnoreCase(contentType.getMimeType())) {
-            AsyncEntityConsumer<T> entityConsumer = consumerSupplier.get();
-            entityConsumerRef.set(entityConsumer);
+        AsyncEntityConsumer<T> entityConsumer;
+        if (ContentType.APPLICATION_JSON.isSameMimeType(contentType)) {
+            entityConsumer = consumerSupplier.get();
         } else {
-            entityConsumerRef.set(new NoopJsonEntityConsumer<>());
+            entityConsumer = new NoopJsonEntityConsumer<>();
         }
-        entityConsumerRef.get().streamStart(entityDetails, new FutureCallback<T>() {
+        entityConsumerRef.set(entityConsumer);
+        entityConsumer.streamStart(entityDetails, new FutureCallback<T>() {
 
             @Override
             public void completed(T result) {
@@ -93,21 +93,35 @@ class JsonMessageConsumer<H extends HttpMessage, T> implements AsyncDataConsumer
 
     @Override
     public final void updateCapacity(CapacityChannel capacityChannel) throws IOException {
-        entityConsumerRef.get().updateCapacity(capacityChannel);
+        final AsyncEntityConsumer<T> entityConsumer = entityConsumerRef.get();
+        if (entityConsumer != null) {
+            entityConsumer.updateCapacity(capacityChannel);
+        } else {
+            capacityChannel.update(Integer.MAX_VALUE);
+        }
     }
 
     @Override
     public final void consume(ByteBuffer data) throws IOException {
-        entityConsumerRef.get().consume(data);
+        final AsyncEntityConsumer<T> entityConsumer = entityConsumerRef.get();
+        if (entityConsumer != null) {
+            entityConsumer.consume(data);
+        }
     }
 
     @Override
     public final void streamEnd(List<? extends Header> trailers) throws HttpException, IOException {
-        entityConsumerRef.get().streamEnd(trailers);
+        final AsyncEntityConsumer<T> entityConsumer = entityConsumerRef.get();
+        if (entityConsumer != null) {
+            entityConsumer.streamEnd(trailers);
+        }
     }
 
     void failed(Exception cause) {
-        entityConsumerRef.get().failed(cause);
+        final AsyncEntityConsumer<T> entityConsumer = entityConsumerRef.get();
+        if (entityConsumer != null) {
+            entityConsumer.failed(cause);
+        }
     }
 
     Message<H, T> getResult() {
