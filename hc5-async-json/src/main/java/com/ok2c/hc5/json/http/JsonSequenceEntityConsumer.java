@@ -19,10 +19,11 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.hc.core5.util.Args;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.TokenBuffer;
 import com.ok2c.hc5.json.JsonResultSink;
@@ -42,18 +43,23 @@ public class JsonSequenceEntityConsumer<T> extends AbstractJsonEntityConsumer<Lo
     private final JsonResultSink<T> resultSink;
     private final AtomicLong count;
 
-    public JsonSequenceEntityConsumer(ObjectMapper objectMapper, Class<T> objectClazz, JsonResultSink<T> resultSink) {
+    public JsonSequenceEntityConsumer(ObjectMapper objectMapper, JavaType javaType, JsonResultSink<T> resultSink) {
         super(Args.notNull(objectMapper, "Object mapper").getFactory());
-        this.readJsonValue = jsonParser -> objectMapper.readValue(jsonParser, objectClazz);
+        this.readJsonValue = jsonParser -> objectMapper.readValue(jsonParser, javaType);
         this.resultSink = Args.notNull(resultSink, "Result sink");
         this.count = new AtomicLong(0);
     }
 
+    public JsonSequenceEntityConsumer(ObjectMapper objectMapper, Class<T> objectClazz, JsonResultSink<T> resultSink) {
+        this(Args.notNull(objectMapper, "Object mapper"),
+                objectMapper.getTypeFactory().constructType(objectClazz),
+                resultSink);
+    }
+
     public JsonSequenceEntityConsumer(ObjectMapper objectMapper, TypeReference<T> typeReference, JsonResultSink<T> resultSink) {
-        super(Args.notNull(objectMapper, "Object mapper").getFactory());
-        this.readJsonValue = jsonParser -> objectMapper.readValue(jsonParser, typeReference);
-        this.resultSink = Args.notNull(resultSink, "Result sink");
-        this.count = new AtomicLong(0);
+        this(Args.notNull(objectMapper, "Object mapper"),
+                objectMapper.getTypeFactory().constructType(typeReference),
+                resultSink);
     }
 
     @Override

@@ -16,11 +16,13 @@
 package com.ok2c.hc5.json.http;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.Message;
 import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ok2c.hc5.json.JsonConsumer;
@@ -37,8 +39,22 @@ public final class JsonResponseConsumers {
      * consisting of the {@link HttpResponse} head and the de-serialized JSON body.
      *
      * @param objectMapper the object mapper to be used to de-serialize JSON content.
-     * @param objectClazz the class of the de-serialized object.
-     * @param <T> the type of result objects produced by the consumer.
+     * @param javaType     the java type of the de-serialized object.
+     * @param <T>          the type of result objects produced by the consumer.
+     * @return the response consumer.
+     */
+    public static <T> AsyncResponseConsumer<Message<HttpResponse, T>> create(ObjectMapper objectMapper,
+                                                                             JavaType javaType) {
+        return new JsonResponseObjectConsumer<>(() -> new JsonObjectEntityConsumer<>(objectMapper, javaType));
+    }
+
+    /**
+     * Creates {@link AsyncResponseConsumer} that produces a {@link Message} object
+     * consisting of the {@link HttpResponse} head and the de-serialized JSON body.
+     *
+     * @param objectMapper the object mapper to be used to de-serialize JSON content.
+     * @param objectClazz  the class of the de-serialized object.
+     * @param <T>          the type of result objects produced by the consumer.
      * @return the response consumer.
      */
     public static <T> AsyncResponseConsumer<Message<HttpResponse, T>> create(ObjectMapper objectMapper,
@@ -50,13 +66,13 @@ public final class JsonResponseConsumers {
      * Creates {@link AsyncResponseConsumer} that produces a {@link Message} object
      * consisting of the {@link HttpResponse} head and the de-serialized JSON body.
      *
-     * @param objectMapper the object mapper to be used to de-serialize JSON content.
+     * @param objectMapper  the object mapper to be used to de-serialize JSON content.
      * @param typeReference the type reference of the de-serialized object.
-     * @param <T> the type of result objects produced by the consumer.
+     * @param <T>           the type of result objects produced by the consumer.
      * @return the response consumer.
      */
     public static <T> AsyncResponseConsumer<Message<HttpResponse, T>> create(ObjectMapper objectMapper,
-            TypeReference<T> typeReference) {
+                                                                             TypeReference<T> typeReference) {
         return new JsonResponseObjectConsumer<>(() -> new JsonObjectEntityConsumer<>(objectMapper, typeReference));
     }
 
@@ -76,11 +92,32 @@ public final class JsonResponseConsumers {
      * into a sequence of instances of the given class and passes those objects
      * to the given {@link JsonResultSink}.
      *
-     * @param objectMapper the object mapper to be used to de-serialize JSON content.
-     * @param objectClazz the class of the de-serialized object.
+     * @param objectMapper    the object mapper to be used to de-serialize JSON content.
+     * @param javaType        the java type of the de-serialized object.
      * @param messageConsumer optional operation that accepts the message head as input.
-     * @param resultSink the recipient of result objects.
-     * @param <T> type of result objects produced by the consumer.
+     * @param resultSink      the recipient of result objects.
+     * @param <T>             type of result objects produced by the consumer.
+     * @return the response consumer.
+     */
+    public static <T> AsyncResponseConsumer<Long> create(ObjectMapper objectMapper,
+                                                         JavaType javaType,
+                                                         JsonConsumer<HttpResponse> messageConsumer,
+                                                         JsonResultSink<T> resultSink) {
+        return new JsonResponseStreamConsumer<>(
+                () -> new JsonSequenceEntityConsumer<>(objectMapper, javaType, resultSink),
+                messageConsumer);
+    }
+
+    /**
+     * Creates {@link AsyncResponseConsumer} that converts incoming HTTP message
+     * into a sequence of instances of the given class and passes those objects
+     * to the given {@link JsonResultSink}.
+     *
+     * @param objectMapper    the object mapper to be used to de-serialize JSON content.
+     * @param objectClazz     the class of the de-serialized object.
+     * @param messageConsumer optional operation that accepts the message head as input.
+     * @param resultSink      the recipient of result objects.
+     * @param <T>             type of result objects produced by the consumer.
      * @return the response consumer.
      */
     public static <T> AsyncResponseConsumer<Long> create(ObjectMapper objectMapper,
@@ -97,17 +134,17 @@ public final class JsonResponseConsumers {
      * into a sequence of instances of the given class and passes those objects
      * to the given {@link JsonResultSink}.
      *
-     * @param objectMapper the object mapper to be used to de-serialize JSON content.
-     * @param typeReference the type reference of the de-serialized object.
+     * @param objectMapper    the object mapper to be used to de-serialize JSON content.
+     * @param typeReference   the type reference of the de-serialized object.
      * @param messageConsumer optional operation that accepts the message head as input.
-     * @param resultSink the recipient of result objects.
-     * @param <T> type of result objects produced by the consumer.
+     * @param resultSink      the recipient of result objects.
+     * @param <T>             type of result objects produced by the consumer.
      * @return the response consumer.
      */
     public static <T> AsyncResponseConsumer<Long> create(ObjectMapper objectMapper,
-            TypeReference<T> typeReference,
-            JsonConsumer<HttpResponse> messageConsumer,
-            JsonResultSink<T> resultSink) {
+                                                         TypeReference<T> typeReference,
+                                                         JsonConsumer<HttpResponse> messageConsumer,
+                                                         JsonResultSink<T> resultSink) {
         return new JsonResponseStreamConsumer<>(
                 () -> new JsonSequenceEntityConsumer<>(objectMapper, typeReference, resultSink),
                 messageConsumer);
@@ -117,9 +154,9 @@ public final class JsonResponseConsumers {
      * Creates {@link AsyncResponseConsumer} that converts incoming HTTP message
      * into a sequence of JSON tokens passed as events to the given {@link JsonTokenEventHandler}.
      *
-     * @param jsonFactory JSON factory.
+     * @param jsonFactory     JSON factory.
      * @param messageConsumer optional operation that accepts the message head as input.
-     * @param eventHandler JSON event handler
+     * @param eventHandler    JSON event handler
      * @return the response consumer.
      */
     public static AsyncResponseConsumer<Void> create(JsonFactory jsonFactory,
