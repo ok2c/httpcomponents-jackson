@@ -27,9 +27,8 @@ import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.nio.DataStreamChannel;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -93,11 +92,10 @@ public class JsonEntityProducerTest {
                 producer.produce(dataChannel);
                 byteChannel.flush();
             }
-            Assert.assertThat(byteChannel.dump(StandardCharsets.US_ASCII),
-                    Matchers.equalTo("[" +
+            Assertions.assertThat(byteChannel.dump(StandardCharsets.US_ASCII)).isEqualTo("[" +
                             "{\"name\":\"param1\",\"value\":\"value\"}," +
                             "{\"name\":\"param2\",\"value\":\"blah-blah-blah-blah-blah-blah-blah-blah-blah-blah-blah\"}" +
-                            "]"));
+                            "]");
             producer.releaseResources();
         }
     }
@@ -124,11 +122,10 @@ public class JsonEntityProducerTest {
                 producer.produce(dataChannel);
                 byteChannel.flush();
             }
-            Assert.assertThat(byteChannel.dump(StandardCharsets.US_ASCII),
-                    Matchers.equalTo("[" +
+            Assertions.assertThat(byteChannel.dump(StandardCharsets.US_ASCII)).isEqualTo("[" +
                             "{\"name\":\"param1\",\"value\":\"value\"}," +
                             "{\"name\":\"param2\",\"value\":\"blah-blah-blah-blah-blah-blah-blah-blah-blah-blah-blah\"}" +
-                            "]"));
+                            "]");
             producer.releaseResources();
         }
     }
@@ -168,11 +165,10 @@ public class JsonEntityProducerTest {
                 producer.produce(dataChannel);
                 byteChannel.flush();
             }
-            Assert.assertThat(byteChannel.dump(StandardCharsets.US_ASCII),
-                    Matchers.equalTo(
+            Assertions.assertThat(byteChannel.dump(StandardCharsets.US_ASCII)).isEqualTo(
                             "{\"name\":\"param1\",\"value\":\"value\"}" +
                             "{\"name\":\"param2\",\"value\":\"blah-blah-blah-blah-blah-blah-blah-blah-blah-blah-blah\"}"
-                    ));
+                    );
             producer.releaseResources();
             count.set(0);
         }

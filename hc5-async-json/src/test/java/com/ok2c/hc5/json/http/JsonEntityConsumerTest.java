@@ -25,17 +25,15 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.impl.BasicEntityDetails;
 import org.apache.hc.core5.http.message.BasicHeader;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -49,7 +47,7 @@ public class JsonEntityConsumerTest {
         JsonFactory factory = new JsonFactory();
 
         URL resource = getClass().getResource("/sample1.json");
-        Assert.assertThat(resource, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource).isNotNull();
 
         AtomicReference<JsonNode> resultRef = new AtomicReference<>();
         JsonNodeEntityConsumer entityConsumer = new JsonNodeEntityConsumer(factory);
@@ -96,7 +94,7 @@ public class JsonEntityConsumerTest {
         expectedObject.put("origin", "xxx.xxx.xxx.xxx");
         expectedObject.put("url", "http://httpbin.org/get");
 
-        Assert.assertThat(resultRef.get(), Matchers.equalTo(expectedObject));
+        Assertions.assertThat(resultRef.get()).isEqualTo((expectedObject));
     }
 
     @Test
@@ -105,7 +103,7 @@ public class JsonEntityConsumerTest {
         ObjectMapper objectMapper = new ObjectMapper(factory);
 
         URL resource = getClass().getResource("/sample1.json");
-        Assert.assertThat(resource, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource).isNotNull();
 
         AtomicReference<RequestData> resultRef = new AtomicReference<>();
         JsonObjectEntityConsumer<RequestData> entityConsumer = new JsonObjectEntityConsumer<>(objectMapper, RequestData.class);
@@ -152,7 +150,7 @@ public class JsonEntityConsumerTest {
         expectedObject.setOrigin("xxx.xxx.xxx.xxx");
         expectedObject.setUrl(URI.create("http://httpbin.org/get"));
 
-        Assert.assertThat(resultRef.get(), Matchers.samePropertyValuesAs(expectedObject));
+        Assertions.assertThat(resultRef.get()).isEqualToComparingFieldByField(expectedObject);
     }
 
     @Test
@@ -161,7 +159,7 @@ public class JsonEntityConsumerTest {
         ObjectMapper objectMapper = new ObjectMapper(factory);
 
         URL resource = getClass().getResource("/sample4.json");
-        Assert.assertThat(resource, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource).isNotNull();
 
         AtomicReference<List<String>> resultRef = new AtomicReference<>();
         JsonObjectEntityConsumer<List<String>> entityConsumer = new JsonObjectEntityConsumer<>(objectMapper, new TypeReference<List<String>>() { });
@@ -192,7 +190,7 @@ public class JsonEntityConsumerTest {
             entityConsumer.streamEnd(null);
         }
 
-        Assert.assertThat(resultRef.get(), Matchers.contains("1", "2", "3", "4"));
+        Assertions.assertThat(resultRef.get()).containsExactly("1", "2", "3", "4");
     }
 
     @Test
@@ -201,7 +199,7 @@ public class JsonEntityConsumerTest {
         ObjectMapper objectMapper = new ObjectMapper(factory);
 
         URL resource = getClass().getResource("/sample3.json");
-        Assert.assertThat(resource, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource).isNotNull();
 
         AtomicReference<Long> resultRef = new AtomicReference<>();
         AtomicInteger started = new AtomicInteger(0);
@@ -255,11 +253,11 @@ public class JsonEntityConsumerTest {
             entityConsumer.streamEnd(null);
         }
 
-        Assert.assertThat(resultRef.get(), Matchers.equalTo(3L));
+        Assertions.assertThat(resultRef.get()).isEqualTo((3L));
 
-        Assert.assertThat(jsonDataList, Matchers.hasSize(3));
-        Assert.assertThat(started.get(), Matchers.equalTo(1));
-        Assert.assertThat(ended.get(), Matchers.equalTo(1));
+        Assertions.assertThat(jsonDataList).hasSize(3);
+        Assertions.assertThat(started.get()).isEqualTo((1));
+        Assertions.assertThat(ended.get()).isEqualTo((1));
 
 
         RequestData expectedObject1 = new RequestData();
@@ -279,7 +277,7 @@ public class JsonEntityConsumerTest {
                         "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36"));
         expectedObject1.setOrigin("xxx.xxx.xxx.xxx");
 
-        Assert.assertThat(jsonDataList.get(0), Matchers.samePropertyValuesAs(expectedObject1));
+        Assertions.assertThat(jsonDataList.get(0)).isEqualToComparingFieldByField(expectedObject1);
 
         RequestData expectedObject2 = new RequestData();
         expectedObject2.setId(1);
@@ -298,7 +296,7 @@ public class JsonEntityConsumerTest {
                         "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36"));
         expectedObject2.setOrigin("xxx.xxx.xxx.xxx");
 
-        Assert.assertThat(jsonDataList.get(1), Matchers.samePropertyValuesAs(expectedObject2));
+        Assertions.assertThat(jsonDataList.get(1)).isEqualToComparingFieldByField(expectedObject2);
 
         RequestData expectedObject3 = new RequestData();
         expectedObject3.setId(2);
@@ -317,7 +315,7 @@ public class JsonEntityConsumerTest {
                         "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36"));
         expectedObject3.setOrigin("xxx.xxx.xxx.xxx");
 
-        Assert.assertThat(jsonDataList.get(2), Matchers.samePropertyValuesAs(expectedObject3));
+        Assertions.assertThat(jsonDataList.get(2)).isEqualToComparingFieldByField((expectedObject3));
     }
 
     @Test
@@ -326,7 +324,7 @@ public class JsonEntityConsumerTest {
         ObjectMapper objectMapper = new ObjectMapper(factory);
 
         URL resource = getClass().getResource("/sample5.json");
-        Assert.assertThat(resource, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource).isNotNull();
 
         AtomicReference<Long> resultRef = new AtomicReference<>();
         AtomicInteger started = new AtomicInteger(0);
@@ -380,15 +378,15 @@ public class JsonEntityConsumerTest {
             entityConsumer.streamEnd(null);
         }
 
-        Assert.assertThat(resultRef.get(), Matchers.equalTo(3L));
+        Assertions.assertThat(resultRef.get()).isEqualTo((3L));
 
-        Assert.assertThat(jsonDataList, Matchers.hasSize(3));
-        Assert.assertThat(started.get(), Matchers.equalTo(1));
-        Assert.assertThat(ended.get(), Matchers.equalTo(1));
+        Assertions.assertThat(jsonDataList).hasSize(3);
+        Assertions.assertThat(started.get()).isEqualTo((1));
+        Assertions.assertThat(ended.get()).isEqualTo((1));
 
-        Assert.assertThat(jsonDataList.get(0), Matchers.contains("1", "2", "3", "4"));
-        Assert.assertThat(jsonDataList.get(1), Matchers.contains("5", "6", "7", "8"));
-        Assert.assertThat(jsonDataList.get(2), Matchers.contains("9", "10", "11", "12"));
+        Assertions.assertThat(jsonDataList.get(0)).containsExactly("1", "2", "3", "4");
+        Assertions.assertThat(jsonDataList.get(1)).containsExactly("5", "6", "7", "8");
+        Assertions.assertThat(jsonDataList.get(2)).containsExactly("9", "10", "11", "12");
     }
 
 }

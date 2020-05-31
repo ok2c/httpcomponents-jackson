@@ -21,16 +21,11 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonTokenId;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class JsonTokenizerTest {
 
@@ -40,14 +35,14 @@ public class JsonTokenizerTest {
         JsonTokenizer jsonTokenizer = new JsonTokenizer(factory);
 
         URL resource1 = getClass().getResource("/sample1.json");
-        Assert.assertThat(resource1, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource1).isNotNull();
 
         List<Integer> tokens1 = new ArrayList<>();
         try (InputStream inputStream = resource1.openStream()) {
             jsonTokenizer.tokenize(inputStream, (tokenId, jsonParser) -> tokens1.add(tokenId));
         }
 
-        Assert.assertThat(tokens1, Matchers.contains(
+        Assertions.assertThat(tokens1).containsExactly(
                 JsonTokenId.ID_START_OBJECT,
                 JsonTokenId.ID_FIELD_NAME,
                 JsonTokenId.ID_START_OBJECT,
@@ -77,17 +72,17 @@ public class JsonTokenizerTest {
                 JsonTokenId.ID_STRING,
                 JsonTokenId.ID_END_OBJECT,
                 JsonTokenId.ID_NO_TOKEN
-        ));
+        );
 
         URL resource2 = getClass().getResource("/sample2.json");
-        Assert.assertThat(resource2, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource2).isNotNull();
 
         List<Integer> tokens2 = new ArrayList<>();
         try (InputStream inputStream = resource2.openStream()) {
             jsonTokenizer.tokenize(inputStream, (tokenId, jsonParser) -> tokens2.add(tokenId));
         }
 
-        Assert.assertThat(tokens2, Matchers.contains(
+        Assertions.assertThat(tokens2).containsExactly(
                 JsonTokenId.ID_START_ARRAY,
                 JsonTokenId.ID_START_ARRAY,
                 JsonTokenId.ID_NUMBER_INT,
@@ -123,17 +118,17 @@ public class JsonTokenizerTest {
                 JsonTokenId.ID_END_ARRAY,
                 JsonTokenId.ID_END_ARRAY,
                 JsonTokenId.ID_NO_TOKEN
-        ));
+        );
 
         URL resource3 = getClass().getResource("/sample3.json");
-        Assert.assertThat(resource3, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource3).isNotNull();
 
         List<Integer> tokens3 = new ArrayList<>();
         try (InputStream inputStream = resource3.openStream()) {
             jsonTokenizer.tokenize(inputStream, (tokenId, jsonParser) -> tokens3.add(tokenId));
         }
 
-        Assert.assertThat(tokens3, Matchers.contains(
+        Assertions.assertThat(tokens3).containsExactly(
                 JsonTokenId.ID_START_OBJECT,
                 JsonTokenId.ID_FIELD_NAME,
                 JsonTokenId.ID_STRING,
@@ -225,7 +220,7 @@ public class JsonTokenizerTest {
                 JsonTokenId.ID_NUMBER_INT,
                 JsonTokenId.ID_END_OBJECT,
                 JsonTokenId.ID_NO_TOKEN
-        ));
+        );
     }
 
     @Test
@@ -234,13 +229,13 @@ public class JsonTokenizerTest {
         JsonAsyncTokenizer jsonTokenizer = new JsonAsyncTokenizer(factory);
 
         URL resource1 = getClass().getResource("/sample1.json");
-        Assert.assertThat(resource1, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource1).isNotNull();
 
         URL resource2 = getClass().getResource("/sample2.json");
-        Assert.assertThat(resource2, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource2).isNotNull();
 
         URL resource3 = getClass().getResource("/sample3.json");
-        Assert.assertThat(resource2, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource2).isNotNull();
 
         for (int bufSize : new int[]{2048, 1024, 256, 32, 16, 8}) {
             List<Integer> tokens1 = new ArrayList<>();
@@ -254,7 +249,7 @@ public class JsonTokenizerTest {
                 jsonTokenizer.streamEnd();
             }
 
-            Assert.assertThat(tokens1, Matchers.contains(
+            Assertions.assertThat(tokens1).containsExactly(
                     JsonTokenId.ID_START_OBJECT,
                     JsonTokenId.ID_FIELD_NAME,
                     JsonTokenId.ID_START_OBJECT,
@@ -284,7 +279,7 @@ public class JsonTokenizerTest {
                     JsonTokenId.ID_STRING,
                     JsonTokenId.ID_END_OBJECT,
                     JsonTokenId.ID_NO_TOKEN
-            ));
+            );
 
             List<Integer> tokens2 = new ArrayList<>();
             try (InputStream inputStream = resource2.openStream()) {
@@ -297,7 +292,7 @@ public class JsonTokenizerTest {
                 jsonTokenizer.streamEnd();
             }
 
-            Assert.assertThat(tokens2, Matchers.contains(
+            Assertions.assertThat(tokens2).containsExactly(
                     JsonTokenId.ID_START_ARRAY,
                     JsonTokenId.ID_START_ARRAY,
                     JsonTokenId.ID_NUMBER_INT,
@@ -333,7 +328,7 @@ public class JsonTokenizerTest {
                     JsonTokenId.ID_END_ARRAY,
                     JsonTokenId.ID_END_ARRAY,
                     JsonTokenId.ID_NO_TOKEN
-            ));
+            );
 
             List<Integer> tokens3 = new ArrayList<>();
             try (InputStream inputStream = resource3.openStream()) {
@@ -346,7 +341,7 @@ public class JsonTokenizerTest {
                 jsonTokenizer.streamEnd();
             }
 
-            Assert.assertThat(tokens3, Matchers.contains(
+            Assertions.assertThat(tokens3).containsExactly(
                     JsonTokenId.ID_START_OBJECT,
                     JsonTokenId.ID_FIELD_NAME,
                     JsonTokenId.ID_STRING,
@@ -438,7 +433,7 @@ public class JsonTokenizerTest {
                     JsonTokenId.ID_NUMBER_INT,
                     JsonTokenId.ID_END_OBJECT,
                     JsonTokenId.ID_NO_TOKEN
-            ));
+            );
         }
     }
 
@@ -459,13 +454,13 @@ public class JsonTokenizerTest {
         jsonTokenizer.consume(b3);
         jsonTokenizer.streamEnd();
 
-        Assert.assertThat(tokens1, Matchers.contains(
+        Assertions.assertThat(tokens1).containsExactly(
                 JsonTokenId.ID_START_OBJECT,
                 JsonTokenId.ID_FIELD_NAME,
                 JsonTokenId.ID_STRING,
                 JsonTokenId.ID_END_OBJECT,
                 JsonTokenId.ID_NO_TOKEN
-        ));
+        );
 
         List<Integer> tokens2 = new ArrayList<>();
         jsonTokenizer.initialize((tokenId, jsonParser) -> tokens2.add(tokenId));
@@ -478,13 +473,13 @@ public class JsonTokenizerTest {
         jsonTokenizer.consume(b6);
         jsonTokenizer.streamEnd();
 
-        Assert.assertThat(tokens2, Matchers.contains(
+        Assertions.assertThat(tokens2).containsExactly(
                 JsonTokenId.ID_START_OBJECT,
                 JsonTokenId.ID_FIELD_NAME,
                 JsonTokenId.ID_STRING,
                 JsonTokenId.ID_END_OBJECT,
                 JsonTokenId.ID_NO_TOKEN
-        ));
+        );
     }
 
 }

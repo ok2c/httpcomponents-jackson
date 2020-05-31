@@ -19,10 +19,9 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assert;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,10 +37,10 @@ public class JsonNodeAssemblerTest {
         JsonAsyncTokenizer jsonTokenizer = new JsonAsyncTokenizer(factory);
 
         URL resource1 = getClass().getResource("/sample1.json");
-        Assert.assertThat(resource1, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource1).isNotNull();
 
         URL resource2 = getClass().getResource("/sample2.json");
-        Assert.assertThat(resource2, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource2).isNotNull();
 
         JsonNodeAssembler jsonNodeAssembler1 = JsonNodeAssembler.create();
 
@@ -72,7 +71,7 @@ public class JsonNodeAssemblerTest {
         expectedObject1.put("origin", "xxx.xxx.xxx.xxx");
         expectedObject1.put("url", "http://httpbin.org/get");
 
-        Assert.assertThat(jsonNode1, Matchers.equalTo(expectedObject1));
+        Assertions.assertThat(jsonNode1).isEqualTo((expectedObject1));
 
         JsonNodeAssembler jsonNodeAssembler2 = JsonNodeAssembler.create();
 
@@ -99,7 +98,7 @@ public class JsonNodeAssemblerTest {
                 .add(2.2)
                 .add(JsonNodeFactory.instance.objectNode().put("name2", "value2"));
 
-        Assert.assertThat(jsonNode2, Matchers.equalTo(expectedObject2));
+        Assertions.assertThat(jsonNode2).isEqualTo((expectedObject2));
     }
 
 }

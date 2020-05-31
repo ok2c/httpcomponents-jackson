@@ -23,10 +23,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,7 +42,7 @@ public class JsonTokenBufferAssemblerTest {
         JsonAsyncTokenizer jsonTokenizer = new JsonAsyncTokenizer(factory);
 
         URL resource = getClass().getResource("/sample1.json");
-        Assert.assertThat(resource, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource).isNotNull();
 
         AtomicReference<TokenBuffer> tokenBufferRef = new AtomicReference<>(null);
         try (InputStream inputStream = resource.openStream()) {
@@ -58,7 +56,7 @@ public class JsonTokenBufferAssemblerTest {
         }
 
         TokenBuffer tokenBuffer = tokenBufferRef.get();
-        Assert.assertThat(tokenBuffer, Matchers.notNullValue());
+        Assertions.assertThat(tokenBuffer).isNotNull();
         JsonNode jsonNode = objectMapper.readTree(tokenBuffer.asParserOnFirstToken());
 
         ObjectNode expectedObject = JsonNodeFactory.instance.objectNode();
@@ -77,7 +75,7 @@ public class JsonTokenBufferAssemblerTest {
         expectedObject.put("origin", "xxx.xxx.xxx.xxx");
         expectedObject.put("url", "http://httpbin.org/get");
 
-        Assert.assertThat(jsonNode, Matchers.equalTo(expectedObject));
+        Assertions.assertThat(jsonNode).isEqualTo(expectedObject);
     }
 
     @Test
@@ -87,7 +85,7 @@ public class JsonTokenBufferAssemblerTest {
         JsonAsyncTokenizer jsonTokenizer = new JsonAsyncTokenizer(factory);
 
         URL resource = getClass().getResource("/sample3.json");
-        Assert.assertThat(resource, CoreMatchers.notNullValue());
+        Assertions.assertThat(resource).isNotNull();
 
         AtomicInteger started = new AtomicInteger(0);
         List<TokenBuffer> tokenBufferList = new ArrayList<>();
@@ -119,12 +117,12 @@ public class JsonTokenBufferAssemblerTest {
             jsonTokenizer.streamEnd();
         }
 
-        Assert.assertThat(tokenBufferList, Matchers.hasSize(3));
-        Assert.assertThat(started.get(), Matchers.equalTo(1));
-        Assert.assertThat(ended.get(), Matchers.equalTo(1));
+        Assertions.assertThat(tokenBufferList).hasSize(3);
+        Assertions.assertThat(started.get()).isEqualTo(1);
+        Assertions.assertThat(ended.get()).isEqualTo((1));
 
         TokenBuffer tokenBuffer1 = tokenBufferList.get(0);
-        Assert.assertThat(tokenBuffer1, Matchers.notNullValue());
+        Assertions.assertThat(tokenBuffer1).isNotNull();
         JsonNode jsonNode1 = objectMapper.readTree(tokenBuffer1.asParserOnFirstToken());
 
         ObjectNode expectedObject1 = JsonNodeFactory.instance.objectNode();
@@ -144,10 +142,10 @@ public class JsonTokenBufferAssemblerTest {
         expectedObject1.put("origin", "xxx.xxx.xxx.xxx");
         expectedObject1.put("id", 0);
 
-        Assert.assertThat(jsonNode1, Matchers.equalTo(expectedObject1));
+        Assertions.assertThat(jsonNode1).isEqualTo((expectedObject1));
 
         TokenBuffer tokenBuffer2 = tokenBufferList.get(1);
-        Assert.assertThat(tokenBuffer2, Matchers.notNullValue());
+        Assertions.assertThat(tokenBuffer2).isNotNull();
         JsonNode jsonNode2 = objectMapper.readTree(tokenBuffer2.asParserOnFirstToken());
 
         ObjectNode expectedObject2 = JsonNodeFactory.instance.objectNode();
@@ -167,10 +165,10 @@ public class JsonTokenBufferAssemblerTest {
         expectedObject2.put("origin", "xxx.xxx.xxx.xxx");
         expectedObject2.put("id", 1);
 
-        Assert.assertThat(jsonNode2, Matchers.equalTo(expectedObject2));
+        Assertions.assertThat(jsonNode2).isEqualTo((expectedObject2));
 
         TokenBuffer tokenBuffer3 = tokenBufferList.get(2);
-        Assert.assertThat(tokenBuffer3, Matchers.notNullValue());
+        Assertions.assertThat(tokenBuffer3).isNotNull();
         JsonNode jsonNode3 = objectMapper.readTree(tokenBuffer3.asParserOnFirstToken());
 
         ObjectNode expectedObject3 = JsonNodeFactory.instance.objectNode();
@@ -190,7 +188,7 @@ public class JsonTokenBufferAssemblerTest {
         expectedObject3.put("origin", "xxx.xxx.xxx.xxx");
         expectedObject3.put("id", 2);
 
-        Assert.assertThat(jsonNode3, Matchers.equalTo(expectedObject3));
+        Assertions.assertThat(jsonNode3).isEqualTo((expectedObject3));
     }
 
     @Test
@@ -202,7 +200,7 @@ public class JsonTokenBufferAssemblerTest {
         jsonTokenizer.initialize(new TokenBufferAssembler(tokenBufferRef::set));
         jsonTokenizer.streamEnd();
 
-        Assert.assertThat(tokenBufferRef.get(), Matchers.nullValue());
+        Assertions.assertThat(tokenBufferRef.get()).isNull();
     }
 
 }

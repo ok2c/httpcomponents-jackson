@@ -4,7 +4,7 @@ dependencies {
     compile libraries.jackson
     testCompile libraries.httpclient
     testCompile libraries.junit
-    testCompile libraries.hamcrest
+    testCompile libraries.assertj
     testCompile libraries.slf4jimpl
 
 }
