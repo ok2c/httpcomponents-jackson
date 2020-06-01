@@ -1,2 +1,0 @@
-rootProject.name = 'httpcomponents-jackson'
-include 'hc5-async-json'
