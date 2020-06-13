@@ -36,13 +36,10 @@ subprojects {
                 val snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
                 url = uri(if (releaseVersion) releasesRepoUrl else snapshotsRepoUrl)
 
-                val userName = project.extra["ossrh.user"] as String?
-                val userPassword= project.extra["ossrh.password"] as String?
-
-                if (userName != null) {
+                if (project.extra.has("ossrh.user")) {
                     credentials {
-                        username = userName
-                        password = userPassword
+                        username = project.extra["ossrh.user"] as String
+                        password = project.extra["ossrh.password"] as String
                     }
                 }
             }
