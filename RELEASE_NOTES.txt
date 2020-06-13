@@ -1,3 +1,20 @@
+Release 0.2.1
+-------------------
+
+This is a minor release that upgrades HttpCore and HttpClient dependencies
+to 5.0.1 GA and fixes a number of minor bugs.
+
+Changelog
+---------
+
+* Bug fix: fixed incorrect result callback invocation in case of an unexpected
+  resource release.
+
+* Support for `JavaType` and `TypeReference` parameter by message and entity consumers.
+  Contributed by Justin Spindler <justin_spindler at comcast.com>
+
+* Issue #2: Fixed NPE in JsonMessageConsumer.
+
 Release 0.2.0
 -------------------
 
