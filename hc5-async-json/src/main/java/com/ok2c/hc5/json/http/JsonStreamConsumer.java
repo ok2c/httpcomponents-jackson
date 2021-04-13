@@ -58,8 +58,7 @@ class JsonStreamConsumer<H extends HttpMessage, T> implements AsyncDataConsumer 
             return;
         }
         ContentType contentType = ContentType.parseLenient(entityDetails.getContentType());
-        if (contentType != null &&
-                ContentType.APPLICATION_JSON.getMimeType().equalsIgnoreCase(contentType.getMimeType())) {
+        if (ContentType.APPLICATION_JSON.isSameMimeType(contentType)) {
             AsyncEntityConsumer<T> entityConsumer = entityConsumerSupplier.get();
             entityConsumerRef.set(entityConsumer);
         } else {
