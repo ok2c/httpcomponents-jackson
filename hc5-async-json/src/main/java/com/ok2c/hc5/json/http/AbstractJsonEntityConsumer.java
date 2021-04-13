@@ -51,8 +51,7 @@ abstract class AbstractJsonEntityConsumer<T> implements AsyncEntityConsumer<T> {
     @Override
     public final void streamStart(EntityDetails entityDetails, FutureCallback<T> resultCallback) throws HttpException, IOException {
         ContentType contentType = ContentType.parseLenient(entityDetails.getContentType());
-        if (contentType != null &&
-                !ContentType.APPLICATION_JSON.getMimeType().equalsIgnoreCase(contentType.getMimeType())) {
+        if (contentType != null && !ContentType.APPLICATION_JSON.isSameMimeType(contentType)) {
             throw new JsonMessageException("Unexpected content type: " + contentType);
         }
         resultCallbackRef.set(resultCallback);
