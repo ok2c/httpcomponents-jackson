@@ -93,11 +93,7 @@ abstract class AbstractJsonEntityConsumer<T> implements AsyncEntityConsumer<T> {
     }
 
     @Override
-    public final void releaseResources() {
-        FutureCallback<T> resultCallback = resultCallbackRef.getAndSet(null);
-        if (resultCallback != null) {
-            resultCallback.cancelled();
-        }
+    public void releaseResources() {
     }
 
 }
