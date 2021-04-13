@@ -17,12 +17,17 @@ val releaseVersion: Boolean by project.extra
 
 dependencies {
     api("org.apache.httpcomponents.core5:httpcore5:${versions["httpcore"]}")
+    api("org.apache.httpcomponents.core5:httpcore5-h2:${versions["httpcore"]}")
     api("com.fasterxml.jackson.core:jackson-databind:${versions["jackson"]}")
     testImplementation("org.apache.httpcomponents.client5:httpclient5:${versions["httpclient"]}")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:${versions["junit-jupiter"]}")
     testImplementation("org.junit.jupiter:junit-jupiter-params:${versions["junit-jupiter"]}")
     testImplementation("org.assertj:assertj-core:${versions["assertj"]}")
     testImplementation("org.slf4j:slf4j-simple:${versions["slf4j"]}")
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
 }
 
 publishing {
