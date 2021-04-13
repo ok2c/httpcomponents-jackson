@@ -72,11 +72,6 @@ final class NoopJsonEntityConsumer<T> implements AsyncEntityConsumer<T> {
 
     @Override
     public void releaseResources() {
-        resultCallbackRef.getAndSet(null);
-        FutureCallback<T> resultCallback = resultCallbackRef.getAndSet(null);
-        if (resultCallback != null) {
-            resultCallback.cancelled();
-        }
     }
 
 }
