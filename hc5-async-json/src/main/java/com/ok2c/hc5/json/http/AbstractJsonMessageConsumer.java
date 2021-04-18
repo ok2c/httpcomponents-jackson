@@ -19,10 +19,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 
 import org.apache.hc.core5.concurrent.FutureCallback;
-import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.EntityDetails;
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpException;
@@ -33,17 +31,18 @@ import org.apache.hc.core5.http.nio.AsyncEntityConsumer;
 import org.apache.hc.core5.http.nio.CapacityChannel;
 import org.apache.hc.core5.http.protocol.HttpContext;
 
-class JsonMessageConsumer<H extends HttpMessage, T> implements AsyncDataConsumer {
+abstract class AbstractJsonMessageConsumer<H extends HttpMessage, T> implements AsyncDataConsumer {
 
-    private final Supplier<AsyncEntityConsumer<T>> consumerSupplier;
     private final AtomicReference<AsyncEntityConsumer<T>> entityConsumerRef;
     private final AtomicReference<Message<H, T>> resultRef;
 
-    public JsonMessageConsumer(Supplier<AsyncEntityConsumer<T>> consumerSupplier) {
-        this.consumerSupplier = consumerSupplier;
+    public AbstractJsonMessageConsumer() {
         this.entityConsumerRef = new AtomicReference<>();
         this.resultRef = new AtomicReference<>();
     }
+
+    protected abstract AsyncEntityConsumer<T> createEntityConsumer(H messageHead,
+                                                                   EntityDetails entityDetails) throws HttpException;
 
     final void consumeMessage(H messageHead, EntityDetails entityDetails, HttpContext context,
                               FutureCallback<Message<H, T>> resultCallback) throws HttpException, IOException {
@@ -53,42 +52,37 @@ class JsonMessageConsumer<H extends HttpMessage, T> implements AsyncDataConsumer
             if (resultCallback != null) {
                 resultCallback.completed(message);
             }
-            return;
         }
-        ContentType contentType = ContentType.parseLenient(entityDetails.getContentType());
-        AsyncEntityConsumer<T> entityConsumer;
-        if (ContentType.APPLICATION_JSON.isSameMimeType(contentType)) {
-            entityConsumer = consumerSupplier.get();
-        } else {
-            entityConsumer = new NoopJsonEntityConsumer<>();
+        else {
+            AsyncEntityConsumer<T> entityConsumer = createEntityConsumer(messageHead, entityDetails);
+            entityConsumer.streamStart(entityDetails, new FutureCallback<T>() {
+
+                @Override
+                public void completed(T result) {
+                    Message<H, T> message = new Message<>(messageHead, result);
+                    resultRef.set(message);
+                    if (resultCallback != null) {
+                        resultCallback.completed(message);
+                    }
+                }
+
+                @Override
+                public void failed(Exception ex) {
+                    if (resultCallback != null) {
+                        resultCallback.failed(ex);
+                    }
+                }
+
+                @Override
+                public void cancelled() {
+                    if (resultCallback != null) {
+                        resultCallback.cancelled();
+                    }
+                }
+
+            });
+            entityConsumerRef.set(entityConsumer);
         }
-        entityConsumerRef.set(entityConsumer);
-        entityConsumer.streamStart(entityDetails, new FutureCallback<T>() {
-
-            @Override
-            public void completed(T result) {
-                Message<H, T> message = new Message<>(messageHead, result);
-                resultRef.set(message);
-                if (resultCallback != null) {
-                    resultCallback.completed(message);
-                }
-            }
-
-            @Override
-            public void failed(Exception ex) {
-                if (resultCallback != null) {
-                    resultCallback.failed(ex);
-                }
-            }
-
-            @Override
-            public void cancelled() {
-                if (resultCallback != null) {
-                    resultCallback.cancelled();
-                }
-            }
-
-        });
     }
 
     @Override
@@ -117,14 +111,14 @@ class JsonMessageConsumer<H extends HttpMessage, T> implements AsyncDataConsumer
         }
     }
 
-    void failed(Exception cause) {
+    public void failed(Exception cause) {
         final AsyncEntityConsumer<T> entityConsumer = entityConsumerRef.get();
         if (entityConsumer != null) {
             entityConsumer.failed(cause);
         }
     }
 
-    Message<H, T> getResult() {
+    public Message<H, T> getResult() {
         return resultRef.get();
     }
 

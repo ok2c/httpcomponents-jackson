@@ -19,27 +19,31 @@ import java.io.IOException;
 import java.util.function.Supplier;
 
 import org.apache.hc.core5.concurrent.FutureCallback;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.EntityDetails;
 import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.Message;
 import org.apache.hc.core5.http.nio.AsyncEntityConsumer;
 import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
 import org.apache.hc.core5.http.protocol.HttpContext;
 
-final class JsonResponseObjectConsumer<T> extends JsonMessageConsumer<HttpResponse, T>
+final class JsonResponseObjectConsumer<T> extends AbstractJsonMessageConsumer<HttpResponse, T>
         implements AsyncResponseConsumer<Message<HttpResponse, T>> {
 
+    private final Supplier<AsyncEntityConsumer<T>> consumerSupplier;
+
     public JsonResponseObjectConsumer(Supplier<AsyncEntityConsumer<T>> consumerSupplier) {
-        super(consumerSupplier);
+        this.consumerSupplier = consumerSupplier;
     }
 
     @Override
-    public void consumeResponse(HttpResponse request,
+    public void consumeResponse(HttpResponse response,
                                 EntityDetails entityDetails,
                                 HttpContext context,
                                 FutureCallback<Message<HttpResponse, T>> resultCallback) throws HttpException, IOException {
-        consumeMessage(request, entityDetails, context, resultCallback);
+        consumeMessage(response, entityDetails, context, resultCallback);
     }
 
     @Override
@@ -47,12 +51,19 @@ final class JsonResponseObjectConsumer<T> extends JsonMessageConsumer<HttpRespon
     }
 
     @Override
-    public void failed(Exception cause) {
-        super.failed(cause);
+    protected AsyncEntityConsumer<T> createEntityConsumer(HttpResponse response,
+                                                          EntityDetails entityDetails) {
+        ContentType contentType = ContentType.parseLenient(entityDetails.getContentType());
+        AsyncEntityConsumer<T> entityConsumer;
+        if (ContentType.APPLICATION_JSON.isSameMimeType(contentType)
+                && response.getCode() >= HttpStatus.SC_SUCCESS
+                && response.getCode() < HttpStatus.SC_REDIRECTION) {
+            entityConsumer = consumerSupplier.get();
+        }
+        else {
+            entityConsumer = new NoopJsonEntityConsumer<>();
+        }
+        return entityConsumer;
     }
 
-    @Override
-    public Message<HttpResponse, T> getResult() {
-        return super.getResult();
-    }
 }
