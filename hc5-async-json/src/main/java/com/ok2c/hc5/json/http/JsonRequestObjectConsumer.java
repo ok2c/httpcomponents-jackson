@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.function.Supplier;
 
 import org.apache.hc.core5.concurrent.FutureCallback;
+import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.EntityDetails;
 import org.apache.hc.core5.http.HttpException;
 import org.apache.hc.core5.http.HttpRequest;
@@ -27,11 +28,13 @@ import org.apache.hc.core5.http.nio.AsyncEntityConsumer;
 import org.apache.hc.core5.http.nio.AsyncRequestConsumer;
 import org.apache.hc.core5.http.protocol.HttpContext;
 
-final class JsonRequestObjectConsumer<T> extends JsonMessageConsumer<HttpRequest, T>
+final class JsonRequestObjectConsumer<T> extends AbstractJsonMessageConsumer<HttpRequest, T>
         implements AsyncRequestConsumer<Message<HttpRequest, T>> {
 
+    private final Supplier<AsyncEntityConsumer<T>> consumerSupplier;
+
     public JsonRequestObjectConsumer(Supplier<AsyncEntityConsumer<T>> consumerSupplier) {
-        super(consumerSupplier);
+        this.consumerSupplier = consumerSupplier;
     }
 
     @Override
@@ -43,12 +46,17 @@ final class JsonRequestObjectConsumer<T> extends JsonMessageConsumer<HttpRequest
     }
 
     @Override
-    public void failed(Exception cause) {
-        super.failed(cause);
+    protected AsyncEntityConsumer<T> createEntityConsumer(HttpRequest request,
+                                                          EntityDetails entityDetails) {
+        ContentType contentType = ContentType.parseLenient(entityDetails.getContentType());
+        AsyncEntityConsumer<T> entityConsumer;
+        if (ContentType.APPLICATION_JSON.isSameMimeType(contentType)) {
+            entityConsumer = consumerSupplier.get();
+        }
+        else {
+            entityConsumer = new NoopJsonEntityConsumer<>();
+        }
+        return entityConsumer;
     }
 
-    @Override
-    public Message<HttpRequest, T> getResult() {
-        return super.getResult();
-    }
 }
