@@ -1,5 +1,5 @@
 val versions = mapOf(
-        "httpcore" to "5.0.3",
+        "httpcore" to "5.0.4",
         "httpclient" to "5.0.3",
         "jackson" to "2.12.3",
         "slf4j" to "1.7.25",
