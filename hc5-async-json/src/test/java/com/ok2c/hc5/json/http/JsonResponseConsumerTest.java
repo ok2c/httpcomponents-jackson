@@ -1,10 +1,12 @@
 package com.ok2c.hc5.json.http;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonTokenId;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ok2c.hc5.json.JsonTokenConsumer;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
+
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.concurrent.FutureCallback;
@@ -16,12 +18,11 @@ import org.apache.hc.core5.http.protocol.HttpContext;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.concurrent.CompletableFuture;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ok2c.hc5.json.JsonTokenConsumer;
 
 public class JsonResponseConsumerTest {
 

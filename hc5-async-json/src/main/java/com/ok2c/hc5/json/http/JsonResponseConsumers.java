@@ -15,6 +15,10 @@
  */
 package com.ok2c.hc5.json.http;
 
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.Message;
+import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
@@ -24,9 +28,6 @@ import com.ok2c.hc5.json.JsonConsumer;
 import com.ok2c.hc5.json.JsonResultSink;
 import com.ok2c.hc5.json.JsonTokenConsumer;
 import com.ok2c.hc5.json.JsonTokenEventHandler;
-import org.apache.hc.core5.http.HttpResponse;
-import org.apache.hc.core5.http.Message;
-import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
 
 /**
  * Factory class for JSON {@link AsyncResponseConsumer}s.
@@ -175,9 +176,9 @@ public final class JsonResponseConsumers {
      * @param tokenConsumer   JSON token Consumer
      * @return the response consumer.
      */
-    public static <T> AsyncResponseConsumer<Void> create(JsonFactory jsonFactory,
-                                                         JsonConsumer<HttpResponse> messageConsumer,
-                                                         JsonTokenConsumer tokenConsumer) {
+    public static AsyncResponseConsumer<Void> create(JsonFactory jsonFactory,
+                                                     JsonConsumer<HttpResponse> messageConsumer,
+                                                     JsonTokenConsumer tokenConsumer) {
         return new JsonResponseStreamConsumer<>(
                 () -> new JsonTokenEntityConsumer(jsonFactory, tokenConsumer),
                 messageConsumer);

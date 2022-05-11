@@ -15,14 +15,15 @@
  */
 package com.ok2c.hc5.json.http;
 
+import java.util.function.Consumer;
+
+import org.apache.hc.core5.util.Args;
+
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonTokenId;
 import com.ok2c.hc5.json.JsonTokenConsumer;
 import com.ok2c.hc5.json.JsonTokenEventHandler;
 import com.ok2c.hc5.json.JsonTokenEventHandlerAdaptor;
-import org.apache.hc.core5.util.Args;
-
-import java.util.function.Consumer;
 
 public class JsonTokenEntityConsumer extends AbstractJsonEntityConsumer<Void> {
 
