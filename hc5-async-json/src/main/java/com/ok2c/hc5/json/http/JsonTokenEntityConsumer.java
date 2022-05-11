@@ -35,7 +35,7 @@ public class JsonTokenEntityConsumer extends AbstractJsonEntityConsumer<Void> {
 
     public JsonTokenEntityConsumer(JsonFactory jsonFactory, JsonTokenConsumer tokenConsumer) {
         super(jsonFactory);
-        this.jsonTokenConsumer = tokenConsumer;
+        this.jsonTokenConsumer = Args.notNull(tokenConsumer, "JSON token consumer");
     }
 
 
