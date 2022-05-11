@@ -1,22 +1,28 @@
 package com.ok2c.hc5.json.http;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonTokenId;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ok2c.hc5.json.JsonTokenConsumer;
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.core5.concurrent.FutureCallback;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpResponse;
-import org.apache.hc.core5.http.HttpStatus;
-import org.apache.hc.core5.http.Message;
+import org.apache.hc.core5.http.*;
 import org.apache.hc.core5.http.impl.BasicEntityDetails;
 import org.apache.hc.core5.http.message.BasicHttpResponse;
 import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
+import org.apache.hc.core5.http.nio.CapacityChannel;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -146,5 +152,34 @@ public class JsonResponseConsumerTest {
             resultFuture.completeExceptionally(new HttpResponseException(code,
                     result.getHead().getReasonPhrase()));
         }
+    }
+
+    @Test
+    void testJsonTokenConsumer() throws Exception {
+        JsonFactory jsonFactory = objectMapper.getFactory();
+        JsonTokenConsumer mockJsonTokenConsumer = Mockito.mock(JsonTokenConsumer.class);
+        AsyncResponseConsumer<Void> responseConsumer = JsonResponseConsumers.create(
+                jsonFactory, null,
+                mockJsonTokenConsumer);
+        HttpResponse mockHttpResponse = Mockito.mock(HttpResponse.class);
+        EntityDetails mockEntityDetails = Mockito.mock(EntityDetails.class);
+        Mockito.when(mockEntityDetails.getContentType()).thenReturn(ContentType.APPLICATION_JSON.getMimeType());
+        HttpContext mockHttpContext = Mockito.mock(HttpContext.class);
+        //noinspection unchecked
+        responseConsumer.consumeResponse(mockHttpResponse, mockEntityDetails, mockHttpContext, null);
+        ByteBuffer data = ByteBuffer.wrap("{\"foo\":\"bar\"}".getBytes(StandardCharsets.UTF_8));
+        responseConsumer.consume(data);
+        responseConsumer.streamEnd(Collections.emptyList());
+        Mockito.verify(mockJsonTokenConsumer).accept(
+                Mockito.eq(JsonTokenId.ID_START_OBJECT), Mockito.any(JsonParser.class));
+        Mockito.verify(mockJsonTokenConsumer).accept(
+                Mockito.eq(JsonTokenId.ID_FIELD_NAME), Mockito.any(JsonParser.class));
+        Mockito.verify(mockJsonTokenConsumer).accept(
+                Mockito.eq(JsonTokenId.ID_STRING), Mockito.any(JsonParser.class));
+        Mockito.verify(mockJsonTokenConsumer).accept(
+                Mockito.eq(JsonTokenId.ID_END_OBJECT), Mockito.any(JsonParser.class));
+        Mockito.verify(mockJsonTokenConsumer).accept(
+                Mockito.eq(JsonTokenId.ID_NO_TOKEN), Mockito.any(JsonParser.class));
+        Mockito.verifyNoMoreInteractions(mockJsonTokenConsumer);
     }
 }
