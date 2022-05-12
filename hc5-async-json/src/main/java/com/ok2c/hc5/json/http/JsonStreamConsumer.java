@@ -30,10 +30,13 @@ import org.apache.hc.core5.http.HttpMessage;
 import org.apache.hc.core5.http.nio.AsyncDataConsumer;
 import org.apache.hc.core5.http.nio.AsyncEntityConsumer;
 import org.apache.hc.core5.http.nio.CapacityChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.ok2c.hc5.json.JsonConsumer;
 
 class JsonStreamConsumer<H extends HttpMessage, T> implements AsyncDataConsumer {
+    private static final Logger logger = LoggerFactory.getLogger(JsonStreamConsumer.class);
 
     private final Supplier<AsyncEntityConsumer<T>> entityConsumerSupplier;
     private final JsonConsumer<H> messageConsumer;
@@ -83,7 +86,12 @@ class JsonStreamConsumer<H extends HttpMessage, T> implements AsyncDataConsumer 
     }
 
     void failed(Exception cause) {
-        entityConsumerRef.get().failed(cause);
+        AsyncEntityConsumer<T> entityConsumer = entityConsumerRef.get();
+        if (null == entityConsumer) {
+            logger.error("failed before entityConsumer was assigned");
+            return;
+        }
+        entityConsumer.failed(cause);
     }
 
     T getResult() {
