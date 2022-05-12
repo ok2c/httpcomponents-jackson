@@ -1,7 +1,9 @@
 package com.ok2c.hc5.json.http;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequests;
@@ -44,7 +46,7 @@ class AbstractJsonEntityConsumerTest {
                         Assertions.assertNotEquals(NullPointerException.class, throwable.getClass());
                         return result;
                     })
-                    .join();
+                    .get(5, TimeUnit.SECONDS);
             Mockito.verifyNoMoreInteractions(mockJsonConsumer, mockJsonTokenEventHandler);
         }
     }
