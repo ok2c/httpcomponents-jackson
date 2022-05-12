@@ -4,6 +4,11 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.hc.core5.concurrent.FutureCallback;
 
+/**
+ * Connects a {@link FutureCallback} to a {@link CompletableFuture}
+ *
+ * @param <T> The result type
+ */
 public class CompletableFutureCallback<T> implements FutureCallback<T> {
 
     private final CompletableFuture<T> future;
