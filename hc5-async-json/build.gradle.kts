@@ -24,6 +24,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:${versions["junit-jupiter"]}")
     testImplementation("org.assertj:assertj-core:${versions["assertj"]}")
     testImplementation("org.slf4j:slf4j-simple:${versions["slf4j"]}")
+    testImplementation("org.mockito:mockito-inline:${versions["mockito"]}")
 }
 
 tasks.named<Test>("test") {

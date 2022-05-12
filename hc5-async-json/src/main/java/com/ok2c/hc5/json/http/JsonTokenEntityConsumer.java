@@ -27,18 +27,23 @@ import com.ok2c.hc5.json.JsonTokenEventHandlerAdaptor;
 
 public class JsonTokenEntityConsumer extends AbstractJsonEntityConsumer<Void> {
 
-    private final JsonTokenEventHandler eventHandler;
+    private final JsonTokenConsumer jsonTokenConsumer;
 
     public JsonTokenEntityConsumer(JsonFactory jsonFactory, JsonTokenEventHandler eventHandler) {
         super(jsonFactory);
-        this.eventHandler = Args.notNull(eventHandler, "JSON event handler");
+        this.jsonTokenConsumer = new JsonTokenEventHandlerAdaptor(Args.notNull(eventHandler, "JSON event handler"));
     }
+
+    public JsonTokenEntityConsumer(JsonFactory jsonFactory, JsonTokenConsumer tokenConsumer) {
+        super(jsonFactory);
+        this.jsonTokenConsumer = Args.notNull(tokenConsumer, "JSON token consumer");
+    }
+
 
     @Override
     protected JsonTokenConsumer createJsonTokenConsumer(Consumer<Void> resultConsumer) {
-        JsonTokenEventHandlerAdaptor callbackAdaptor = new JsonTokenEventHandlerAdaptor(eventHandler);
         return (tokenId, jsonParser) -> {
-            callbackAdaptor.accept(tokenId, jsonParser);
+            jsonTokenConsumer.accept(tokenId, jsonParser);
             if (tokenId == JsonTokenId.ID_NO_TOKEN) {
                 resultConsumer.accept(null);
             }

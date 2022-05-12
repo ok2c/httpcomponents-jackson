@@ -15,18 +15,18 @@
  */
 package com.ok2c.hc5.json.http;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.Message;
 import org.apache.hc.core5.http.nio.AsyncResponseConsumer;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ok2c.hc5.json.JsonConsumer;
 import com.ok2c.hc5.json.JsonResultSink;
+import com.ok2c.hc5.json.JsonTokenConsumer;
 import com.ok2c.hc5.json.JsonTokenEventHandler;
 
 /**
@@ -167,4 +167,20 @@ public final class JsonResponseConsumers {
                 messageConsumer);
     }
 
+    /**
+     * Creates {@link AsyncResponseConsumer} that converts incoming HTTP message
+     * into a sequence of JSON tokens passed as events to the given {@link JsonTokenConsumer}.
+     *
+     * @param jsonFactory     JSON factory.
+     * @param messageConsumer optional operation that accepts the message head as input.
+     * @param tokenConsumer   JSON token Consumer
+     * @return the response consumer.
+     */
+    public static AsyncResponseConsumer<Void> create(JsonFactory jsonFactory,
+                                                     JsonConsumer<HttpResponse> messageConsumer,
+                                                     JsonTokenConsumer tokenConsumer) {
+        return new JsonResponseStreamConsumer<>(
+                () -> new JsonTokenEntityConsumer(jsonFactory, tokenConsumer),
+                messageConsumer);
+    }
 }
