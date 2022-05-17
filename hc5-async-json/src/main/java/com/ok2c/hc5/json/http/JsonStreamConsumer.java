@@ -83,7 +83,10 @@ class JsonStreamConsumer<H extends HttpMessage, T> implements AsyncDataConsumer 
     }
 
     void failed(Exception cause) {
-        entityConsumerRef.get().failed(cause);
+        AsyncEntityConsumer<T> entityConsumer = entityConsumerRef.get();
+        if (entityConsumer != null) {
+            entityConsumer.failed(cause);
+        }
     }
 
     T getResult() {
