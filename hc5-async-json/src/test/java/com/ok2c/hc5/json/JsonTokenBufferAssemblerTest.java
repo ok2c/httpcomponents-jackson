@@ -203,4 +203,117 @@ public class JsonTokenBufferAssemblerTest {
         Assertions.assertThat(tokenBufferRef.get()).isNull();
     }
 
+    @Test
+    public void testTokenBufferArrayAssembly() throws Exception {
+        JsonFactory factory = new JsonFactory();
+        ObjectMapper objectMapper = new ObjectMapper(factory);
+        JsonAsyncTokenizer jsonTokenizer = new JsonAsyncTokenizer(factory);
+
+        URL resource = getClass().getResource("/sample6.json");
+        Assertions.assertThat(resource).isNotNull();
+
+        AtomicInteger started = new AtomicInteger(0);
+        List<TokenBuffer> tokenBufferList = new ArrayList<>();
+        AtomicInteger ended = new AtomicInteger(0);
+        try (InputStream inputStream = resource.openStream()) {
+            jsonTokenizer.initialize(new TopLevelArrayTokenFilter(new TokenBufferAssembler(new JsonResultSink<TokenBuffer>() {
+
+                @Override
+                public void begin(int sizeHint) {
+                    started.incrementAndGet();
+                }
+
+                @Override
+                public void accept(TokenBuffer tokenBuffer) {
+                    tokenBufferList.add(tokenBuffer);
+                }
+
+                @Override
+                public void end() {
+                    ended.incrementAndGet();
+                }
+
+            })));
+            byte[] bytebuf = new byte[1024];
+            int len;
+            while ((len = inputStream.read(bytebuf)) != -1) {
+                jsonTokenizer.consume(ByteBuffer.wrap(bytebuf, 0, len));
+            }
+            jsonTokenizer.streamEnd();
+        }
+
+        Assertions.assertThat(tokenBufferList).hasSize(3);
+        Assertions.assertThat(started.get()).isEqualTo(1);
+        Assertions.assertThat(ended.get()).isEqualTo((1));
+
+        TokenBuffer tokenBuffer1 = tokenBufferList.get(0);
+        Assertions.assertThat(tokenBuffer1).isNotNull();
+        JsonNode jsonNode1 = objectMapper.readTree(tokenBuffer1.asParserOnFirstToken());
+
+        ObjectNode expectedObject1 = JsonNodeFactory.instance.objectNode();
+        expectedObject1.put("url", "http://httpbin.org/stream/3");
+        expectedObject1.putObject("args");
+        expectedObject1.putObject("headers")
+                .put("Host", "httpbin.org")
+                .put("Connection", "close")
+                .put("Referer", "http://httpbin.org/")
+                .put("Accept", "application/json")
+                .put("Accept-Encoding", "gzip, deflate")
+                .put("Accept-Language", "en-US,en;q=0.9")
+                .put("Cookie", "_gauges_unique_year=1; _gauges_unique=1; _gauges_unique_month=1; _gauges_unique_day=1; " +
+                        "_gauges_unique_hour=1")
+                .put("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) " +
+                        "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36");
+        expectedObject1.put("origin", "xxx.xxx.xxx.xxx");
+        expectedObject1.put("id", 0);
+
+        Assertions.assertThat(jsonNode1).isEqualTo((expectedObject1));
+
+        TokenBuffer tokenBuffer2 = tokenBufferList.get(1);
+        Assertions.assertThat(tokenBuffer2).isNotNull();
+        JsonNode jsonNode2 = objectMapper.readTree(tokenBuffer2.asParserOnFirstToken());
+
+        ObjectNode expectedObject2 = JsonNodeFactory.instance.objectNode();
+        expectedObject2.put("url", "http://httpbin.org/stream/3");
+        expectedObject2.putObject("args");
+        expectedObject2.putObject("headers")
+                .put("Host", "httpbin.org")
+                .put("Connection", "close")
+                .put("Referer", "http://httpbin.org/")
+                .put("Accept", "application/json")
+                .put("Accept-Encoding", "gzip, deflate")
+                .put("Accept-Language", "en-US,en;q=0.9")
+                .put("Cookie", "_gauges_unique_year=1; _gauges_unique=1; _gauges_unique_month=1; _gauges_unique_day=1; " +
+                        "_gauges_unique_hour=1")
+                .put("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) " +
+                        "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36");
+        expectedObject2.put("origin", "xxx.xxx.xxx.xxx");
+        expectedObject2.put("id", 1);
+
+        Assertions.assertThat(jsonNode2).isEqualTo((expectedObject2));
+
+        TokenBuffer tokenBuffer3 = tokenBufferList.get(2);
+        Assertions.assertThat(tokenBuffer3).isNotNull();
+        JsonNode jsonNode3 = objectMapper.readTree(tokenBuffer3.asParserOnFirstToken());
+
+        ObjectNode expectedObject3 = JsonNodeFactory.instance.objectNode();
+        expectedObject3.put("url", "http://httpbin.org/stream/3");
+        expectedObject3.putObject("args");
+        expectedObject3.putObject("headers")
+                .put("Host", "httpbin.org")
+                .put("Connection", "close")
+                .put("Referer", "http://httpbin.org/")
+                .put("Accept", "application/json")
+                .put("Accept-Encoding", "gzip, deflate")
+                .put("Accept-Language", "en-US,en;q=0.9")
+                .put("Cookie", "_gauges_unique_year=1; _gauges_unique=1; _gauges_unique_month=1; _gauges_unique_day=1; " +
+                        "_gauges_unique_hour=1")
+                .put("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) " +
+                        "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36");
+        expectedObject3.put("origin", "xxx.xxx.xxx.xxx");
+        expectedObject3.put("id", 2);
+
+        Assertions.assertThat(jsonNode3).isEqualTo((expectedObject3));
+    }
+
 }
