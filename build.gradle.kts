@@ -1,11 +1,11 @@
 val versions = mapOf(
-        "httpcore" to "5.0.4",
-        "httpclient" to "5.0.3",
+        "httpcore" to "5.1.3",
+        "httpclient" to "5.1.3",
         "jackson" to "2.12.3",
-        "slf4j" to "1.7.25",
-        "junit-jupiter" to "5.7.1",
+        "slf4j" to "1.7.36",
+        "junit-jupiter" to "5.8.2",
         "mockito" to "4.5.1",
-        "assertj" to "3.15.0"
+        "assertj" to "3.22.0"
 )
 
 allprojects {
