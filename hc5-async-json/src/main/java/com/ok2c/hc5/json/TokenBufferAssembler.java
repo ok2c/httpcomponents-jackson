@@ -17,8 +17,7 @@
 package com.ok2c.hc5.json;
 
 import java.io.IOException;
-
-import org.apache.hc.core5.util.Args;
+import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonTokenId;
@@ -37,7 +36,7 @@ public final class TokenBufferAssembler implements JsonTokenConsumer {
     private TokenBuffer buffer;
 
     public TokenBufferAssembler(JsonResultSink<TokenBuffer> sink) {
-        Args.notNull(sink, "Result sink");
+        Objects.requireNonNull(sink, "Result sink");
         this.sink = sink;
         this.buffer = new TokenBuffer(null, false);
     }

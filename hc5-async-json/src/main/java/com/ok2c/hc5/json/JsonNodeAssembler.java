@@ -18,8 +18,6 @@ package com.ok2c.hc5.json;
 import java.util.LinkedList;
 import java.util.function.Consumer;
 
-import org.apache.hc.core5.util.Asserts;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ContainerNode;
@@ -124,8 +122,9 @@ public final class JsonNodeAssembler implements JsonTokenEventHandler {
 
     @Override
     public void embeddedObject(Object object) {
-        Asserts.notNull(currentObject, "Current JSON object");
-        if (currentObject instanceof ObjectNode) {
+        if (currentObject == null) {
+            throw new IllegalStateException("Current node is null");
+        } else if (currentObject instanceof ObjectNode) {
             ((ObjectNode) currentObject).putPOJO(currentField, object);
         } else if (currentObject instanceof ArrayNode) {
             ((ArrayNode) currentObject).addPOJO(object);

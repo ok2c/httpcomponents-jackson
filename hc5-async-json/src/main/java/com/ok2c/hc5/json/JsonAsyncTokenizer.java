@@ -17,8 +17,7 @@ package com.ok2c.hc5.json;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
-import org.apache.hc.core5.util.Args;
+import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -47,7 +46,7 @@ public final class JsonAsyncTokenizer {
      * @param consumer the token event consumer.
      */
     public void initialize(JsonTokenConsumer consumer) throws IOException {
-        Args.notNull(consumer, "Consumer");
+        Objects.requireNonNull(consumer, "Consumer");
         this.parser = jsonFactory.createNonBlockingByteArrayParser();
         this.inputFeeder = (ByteArrayFeeder) parser.getNonBlockingInputFeeder();
         this.consumer = consumer;

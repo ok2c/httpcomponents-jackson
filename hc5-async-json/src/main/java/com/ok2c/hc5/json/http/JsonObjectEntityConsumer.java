@@ -16,9 +16,8 @@
 package com.ok2c.hc5.json.http;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.function.Consumer;
-
-import org.apache.hc.core5.util.Args;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -38,16 +37,16 @@ public class JsonObjectEntityConsumer<T> extends AbstractJsonEntityConsumer<T> {
     private final ReadJsonValue<T> readJsonValue;
 
     public JsonObjectEntityConsumer(ObjectMapper objectMapper, JavaType javaType) {
-        super(Args.notNull(objectMapper, "Object mapper").getFactory());
+        super(Objects.requireNonNull(objectMapper, "Object mapper").getFactory());
         this.readJsonValue = jsonParser -> objectMapper.readValue(jsonParser, javaType);
     }
 
     public JsonObjectEntityConsumer(ObjectMapper objectMapper, Class<T> objectClazz) {
-        this(Args.notNull(objectMapper, "Object mapper"), objectMapper.getTypeFactory().constructType(objectClazz));
+        this(Objects.requireNonNull(objectMapper, "Object mapper"), objectMapper.getTypeFactory().constructType(objectClazz));
     }
 
     public JsonObjectEntityConsumer(ObjectMapper objectMapper, TypeReference<T> typeReference) {
-        this(Args.notNull(objectMapper, "Object mapper"), objectMapper.getTypeFactory().constructType(typeReference));
+        this(Objects.requireNonNull(objectMapper, "Object mapper"), objectMapper.getTypeFactory().constructType(typeReference));
     }
 
     @Override

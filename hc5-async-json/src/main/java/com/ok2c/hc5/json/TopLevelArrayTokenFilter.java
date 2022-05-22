@@ -17,8 +17,7 @@
 package com.ok2c.hc5.json;
 
 import java.io.IOException;
-
-import org.apache.hc.core5.util.Args;
+import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonTokenId;
@@ -32,7 +31,7 @@ public final class TopLevelArrayTokenFilter implements JsonTokenConsumer {
     private int depth;
 
     public TopLevelArrayTokenFilter(JsonTokenConsumer tokenConsumer) {
-        Args.notNull(tokenConsumer, "Consumer");
+        Objects.requireNonNull(tokenConsumer, "Consumer");
         this.tokenConsumer = tokenConsumer;
     }
 

@@ -15,9 +15,8 @@
  */
 package com.ok2c.hc5.json.http;
 
+import java.util.Objects;
 import java.util.function.Consumer;
-
-import org.apache.hc.core5.util.Args;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonTokenId;
@@ -31,12 +30,12 @@ public class JsonTokenEntityConsumer extends AbstractJsonEntityConsumer<Void> {
 
     public JsonTokenEntityConsumer(JsonFactory jsonFactory, JsonTokenEventHandler eventHandler) {
         super(jsonFactory);
-        this.jsonTokenConsumer = new JsonTokenEventHandlerAdaptor(Args.notNull(eventHandler, "JSON event handler"));
+        this.jsonTokenConsumer = new JsonTokenEventHandlerAdaptor(Objects.requireNonNull(eventHandler, "JSON event handler"));
     }
 
     public JsonTokenEntityConsumer(JsonFactory jsonFactory, JsonTokenConsumer tokenConsumer) {
         super(jsonFactory);
-        this.jsonTokenConsumer = Args.notNull(tokenConsumer, "JSON token consumer");
+        this.jsonTokenConsumer = Objects.requireNonNull(tokenConsumer, "JSON token consumer");
     }
 
 
