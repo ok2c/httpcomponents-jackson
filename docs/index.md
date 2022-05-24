@@ -22,7 +22,7 @@ The library is available in Maven Central with the following coordinates:
 <dependency>
   <groupId>com.github.ok2c.hc5</groupId>
   <artifactId>hc5-async-json</artifactId>
-  <version>0.2.1</version>
+  <version>0.3.0</version>
 </dependency>
 ```
 ## HTTP response message consumers
@@ -353,3 +353,28 @@ or multiple JSON objects of the same class using Jackson's `ObjectMapper`
     Shutting down
     RequestData{id=0, url=http://httpbin.org/post, origin='xxx.xxx.xxx.xxx', headers={Connection=close, Content-Type=application/json; charset=UTF-8, Host=httpbin.org, Transfer-Encoding=chunked, User-Agent=Apache-HttpAsyncClient/5.0-beta3 (Java/1.8.0_181)}, args={}, data='{"name":"name1","value":"value1"}{"name":"name2","value":"value2"}{"name":"name3","value":"value3"}', json=null}
     ``` 
+
+## General purpose event driven bulk JSON readers
+
+`JsonBulkArrayReader` is a general-purpose event driven JSOM reader that can be used to read large arrays
+of objects while buffering only a single array element in memory. `JsonBulkArrayReader` has no dependency on
+HttpComponents APIs.
+
+```java
+JsonFactory factory = new JsonFactory();
+ObjectMapper objectMapper = new ObjectMapper(factory);
+
+URL resource = JsonBulkArrayReaderExample.class.getResource("/sample6.json");
+
+JsonBulkArrayReader bulkArrayReader = new JsonBulkArrayReader(objectMapper);
+bulkArrayReader.initialize(new TypeReference<RequestData>() {}, entry -> System.out.println(entry));
+try (InputStream inputStream = resource.openStream()) {
+   int l;
+   byte[] tmp = new byte[4096];
+   while ((l = inputStream.read(tmp)) != -1) {
+       bulkArrayReader.consume(ByteBuffer.wrap(tmp, 0, l));
+   }
+   bulkArrayReader.streamEnd();
+}
+```
+
