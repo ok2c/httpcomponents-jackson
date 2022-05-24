@@ -10,7 +10,7 @@ val versions = mapOf(
 
 allprojects {
     group = "com.github.ok2c.hc5"
-    version = "0.2.3-SNAPSHOT"
+    version = "0.3.0"
 
     repositories {
         mavenCentral()
