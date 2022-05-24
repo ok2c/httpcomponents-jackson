@@ -1,3 +1,24 @@
+Release 0.3.0
+-------------------
+
+This is a minor feature release that introduces support for event driven parsing of large arrays
+of JSON objects and fixes a number of bugs reported since 0.2.2.
+
+* Upgraded HttpCore to version 5.1.3.
+
+* Removed dependency on HttpCore from generic JSON processing classes.
+
+* Added event-driven bulk JSON reader that can read arrays of objects while buffering only
+  a single array element in memory.
+
+* Issue #9: Check for null before calling the entityConsumer on the AtomicReference.
+Contributed by Sheridan C Rawlins <41922797+scr-oath at users.noreply.github.com>
+
+* Issue #7: Add JsonTokenConsumer creation for consuming tokenId + parser.
+Contributed by Sheridan C Rawlins <41922797+scr-oath at users.noreply.github.com>
+
+
+
 Release 0.2.2
 -------------------
 
