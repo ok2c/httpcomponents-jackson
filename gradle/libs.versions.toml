@@ -1,0 +1,20 @@
+[versions]
+httpcore = "5.2.3"
+jackson = "2.16.0"
+httpclient = "5.2.1"
+slf4j = "1.7.36"
+junit = "5.8.2"
+mockito = "4.5.1"
+assertj = "3.22.0"
+
+
+[libraries]
+httpcore = { group = "org.apache.httpcomponents.core5", name = "httpcore5", version.ref = "httpcore" }
+httpcore-h2 = { group = "org.apache.httpcomponents.core5", name = "httpcore5-h2", version.ref = "httpcore" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
+httpclient = { group = "org.apache.httpcomponents.client5", name = "httpclient5", version.ref = "httpclient" }
+slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j" }
+junit-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "junit" }
+junit-params = { group = "org.junit.jupiter", name = "junit-jupiter-params", version.ref = "junit" }
+assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj" }
+mockito = { group = "org.mockito", name = "mockito-inline", version.ref = "mockito" }

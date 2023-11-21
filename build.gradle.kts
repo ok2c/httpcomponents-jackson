@@ -1,13 +1,3 @@
-val versions = mapOf(
-        "httpcore" to "5.2.3",
-        "httpclient" to "5.2.1",
-        "jackson" to "2.16.0",
-        "slf4j" to "1.7.36",
-        "junit-jupiter" to "5.8.2",
-        "mockito" to "4.5.1",
-        "assertj" to "3.22.0"
-)
-
 allprojects {
     group = "com.github.ok2c.hc5"
     version = "0.3.1-SNAPSHOT"
@@ -17,7 +7,6 @@ allprojects {
     }
 
     extra["releaseVersion"] = !version.toString().endsWith("-SNAPSHOT")
-    extra["versions"] = versions
 }
 
 subprojects {
