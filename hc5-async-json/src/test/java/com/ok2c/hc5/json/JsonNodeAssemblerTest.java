@@ -19,15 +19,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 
-import org.assertj.core.api.Assert;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class JsonNodeAssemblerTest {
 

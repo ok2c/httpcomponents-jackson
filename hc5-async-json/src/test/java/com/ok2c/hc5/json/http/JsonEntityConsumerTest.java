@@ -25,13 +25,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.hc.core5.concurrent.FutureCallback;
-import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.impl.BasicEntityDetails;
-import org.apache.hc.core5.http.message.BasicHeader;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,6 +32,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ok2c.hc5.json.JsonResultSink;
+
+import org.apache.hc.core5.concurrent.FutureCallback;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.impl.BasicEntityDetails;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class JsonEntityConsumerTest {
 
@@ -150,7 +150,7 @@ public class JsonEntityConsumerTest {
         expectedObject.setOrigin("xxx.xxx.xxx.xxx");
         expectedObject.setUrl(URI.create("http://httpbin.org/get"));
 
-        Assertions.assertThat(resultRef.get()).isEqualToComparingFieldByField(expectedObject);
+        Assertions.assertThat(resultRef.get()).usingRecursiveComparison().isEqualTo(expectedObject);
     }
 
     @Test
@@ -277,7 +277,7 @@ public class JsonEntityConsumerTest {
                         "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36"));
         expectedObject1.setOrigin("xxx.xxx.xxx.xxx");
 
-        Assertions.assertThat(jsonDataList.get(0)).isEqualToComparingFieldByField(expectedObject1);
+        Assertions.assertThat(jsonDataList.get(0)).usingRecursiveComparison().isEqualTo(expectedObject1);
 
         RequestData expectedObject2 = new RequestData();
         expectedObject2.setId(1);
@@ -296,7 +296,7 @@ public class JsonEntityConsumerTest {
                         "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36"));
         expectedObject2.setOrigin("xxx.xxx.xxx.xxx");
 
-        Assertions.assertThat(jsonDataList.get(1)).isEqualToComparingFieldByField(expectedObject2);
+        Assertions.assertThat(jsonDataList.get(1)).usingRecursiveComparison().isEqualTo(expectedObject2);
 
         RequestData expectedObject3 = new RequestData();
         expectedObject3.setId(2);
@@ -315,7 +315,7 @@ public class JsonEntityConsumerTest {
                         "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36"));
         expectedObject3.setOrigin("xxx.xxx.xxx.xxx");
 
-        Assertions.assertThat(jsonDataList.get(2)).isEqualToComparingFieldByField((expectedObject3));
+        Assertions.assertThat(jsonDataList.get(2)).usingRecursiveComparison().isEqualTo(expectedObject3);
     }
 
     @Test

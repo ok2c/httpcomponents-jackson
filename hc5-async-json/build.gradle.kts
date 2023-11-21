@@ -24,6 +24,7 @@ dependencies {
     testImplementation(libs.junit.params)
     testImplementation(libs.mockito)
     testImplementation(libs.assertj.core)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.named<Test>("test") {

@@ -23,14 +23,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.hc.core5.http.message.BasicHeader;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ok2c.hc5.json.http.RequestData;
+
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class JsonBulkArrayReaderTest {
 
@@ -71,7 +71,7 @@ public class JsonBulkArrayReaderTest {
                         "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36"));
         expectedObject1.setOrigin("xxx.xxx.xxx.xxx");
 
-        Assertions.assertThat(jsonDataList.get(0)).isEqualToComparingFieldByField(expectedObject1);
+        Assertions.assertThat(jsonDataList.get(0)).usingRecursiveComparison().isEqualTo(expectedObject1);
 
         RequestData expectedObject2 = new RequestData();
         expectedObject2.setId(1);
@@ -90,7 +90,7 @@ public class JsonBulkArrayReaderTest {
                         "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36"));
         expectedObject2.setOrigin("xxx.xxx.xxx.xxx");
 
-        Assertions.assertThat(jsonDataList.get(1)).isEqualToComparingFieldByField(expectedObject2);
+        Assertions.assertThat(jsonDataList.get(1)).usingRecursiveComparison().isEqualTo(expectedObject2);
 
         RequestData expectedObject3 = new RequestData();
         expectedObject3.setId(2);
@@ -109,7 +109,7 @@ public class JsonBulkArrayReaderTest {
                         "snap Chromium/71.0.3578.98 Chrome/71.0.3578.98 Safari/537.36"));
         expectedObject3.setOrigin("xxx.xxx.xxx.xxx");
 
-        Assertions.assertThat(jsonDataList.get(2)).isEqualToComparingFieldByField((expectedObject3));
+        Assertions.assertThat(jsonDataList.get(2)).usingRecursiveComparison().isEqualTo((expectedObject3));
     }
 
 }
