@@ -18,13 +18,13 @@ package com.ok2c.hc5.json.http.examles;
 import java.net.URI;
 import java.util.concurrent.Future;
 
-import org.apache.hc.client5.http.async.methods.BasicHttpRequests;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.HttpResponse;
 import org.apache.hc.core5.http.Message;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
+import org.apache.hc.core5.http.support.BasicRequestBuilder;
 import org.apache.hc.core5.io.CloseMode;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -48,7 +48,7 @@ public class JsonObjectRequestExample {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         System.out.println("Executing POST " + uri);
         Future<?> future = client.execute(
-                JsonRequestProducers.create(BasicHttpRequests.post(uri),
+                JsonRequestProducers.create(BasicRequestBuilder.post(uri).build(),
                         new BasicNameValuePair("name", "value"), objectMapper),
                 JsonResponseConsumers.create(objectMapper, RequestData.class),
                 new FutureCallback<Message<HttpResponse, RequestData>>() {

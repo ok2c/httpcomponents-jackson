@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
@@ -65,8 +67,11 @@ public class JsonResponseConsumerTest {
         consumer.streamEnd(null);
 
         // SUCCESS: Non-JSON content-type is ignored by the consumer, it returns a 'null' to the callback.
-        assertThat(resultFuture).hasFailedWithThrowableThat()
-                .isInstanceOf(HttpResponseException.class);
+        assertThat(resultFuture)
+                .failsWithin(Duration.ofMinutes(1))
+                .withThrowableThat()
+                .isInstanceOf(ExecutionException.class)
+                .withCauseInstanceOf(HttpResponseException.class);
     }
 
     @Test
@@ -103,8 +108,11 @@ public class JsonResponseConsumerTest {
         consumer.streamEnd(null);
 
         // FAILS: consumer attempts to parse the error body as it was a successful response and throws a parsing error
-        assertThat(resultFuture).hasFailedWithThrowableThat()
-                .isInstanceOf(HttpResponseException.class);
+        assertThat(resultFuture)
+                .failsWithin(Duration.ofMinutes(1))
+                .withThrowableThat()
+                .isInstanceOf(ExecutionException.class)
+                .withCauseInstanceOf(HttpResponseException.class);
     }
 
     @Test
@@ -141,8 +149,11 @@ public class JsonResponseConsumerTest {
         consumer.streamEnd(null);
 
         // FAILS: consumer attempts to parse the error body as it was a successful response and throws a parsing error
-        assertThat(resultFuture).hasFailedWithThrowableThat()
-                .isInstanceOf(HttpResponseException.class);
+        assertThat(resultFuture)
+                .failsWithin(Duration.ofMinutes(1))
+                .withThrowableThat()
+                .isInstanceOf(ExecutionException.class)
+                .withCauseInstanceOf(HttpResponseException.class);
     }
 
     private static <T> void handleResponseResult(Message<HttpResponse, T> result, CompletableFuture<T> resultFuture) {

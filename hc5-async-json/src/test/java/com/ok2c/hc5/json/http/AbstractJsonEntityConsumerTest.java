@@ -1,11 +1,10 @@
 package com.ok2c.hc5.json.http;
 
-import java.net.URI;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.hc.client5.http.async.methods.SimpleHttpRequest;
-import org.apache.hc.client5.http.async.methods.SimpleHttpRequests;
+import org.apache.hc.client5.http.async.methods.SimpleRequestBuilder;
 import org.apache.hc.client5.http.async.methods.SimpleRequestProducer;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
@@ -28,7 +27,7 @@ class AbstractJsonEntityConsumerTest {
         // Verify that a request to self with an invalid url still calls the completion.
         try (CloseableHttpAsyncClient httpClient = HttpAsyncClients.createHttp2Default()) {
             httpClient.start();
-            SimpleHttpRequest request = SimpleHttpRequests.get(URI.create("http://localhost/INVALID"));
+            SimpleHttpRequest request = SimpleRequestBuilder.get("http://localhost/INVALID").build();
             JsonFactory jsonFactory = mapper.getFactory();
             JsonTokenEventHandler mockJsonTokenEventHandler = Mockito.mock(JsonTokenEventHandler.class);
             @SuppressWarnings("unchecked")
