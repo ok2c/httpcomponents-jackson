@@ -14,6 +14,10 @@ subprojects {
         (options as StandardJavadocDocletOptions).addBooleanOption("Xdoclint:-missing", true)
     }
 
+    tasks.withType<JavaCompile> {
+        options.compilerArgs.add("-Xlint:deprecation")
+    }
+
     apply<MavenPublishPlugin>()
 
     configure<PublishingExtension> {
