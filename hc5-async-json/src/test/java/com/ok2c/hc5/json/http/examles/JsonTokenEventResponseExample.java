@@ -87,6 +87,11 @@ public class JsonTokenEventResponseExample {
                             }
 
                             @Override
+                            public void value(long value) {
+                                System.out.print(value + "/");
+                            }
+
+                            @Override
                             public void value(double value) {
                                 System.out.print(value + "/");
                             }

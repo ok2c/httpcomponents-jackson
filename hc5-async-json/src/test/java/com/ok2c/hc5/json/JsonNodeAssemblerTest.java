@@ -96,6 +96,7 @@ public class JsonNodeAssemblerTest {
                 .add(2)
                 .add(2.2)
                 .add(JsonNodeFactory.instance.objectNode().put("name2", "value2"));
+        expectedObject2.addArray().add(JsonNodeFactory.instance.objectNode().put("long", 2153599188L));
 
         Assertions.assertThat(jsonNode2).isEqualTo((expectedObject2));
     }

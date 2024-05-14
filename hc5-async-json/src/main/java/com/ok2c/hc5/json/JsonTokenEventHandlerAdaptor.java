@@ -53,7 +53,13 @@ public final class JsonTokenEventHandlerAdaptor implements JsonTokenConsumer {
                 eventHandler.value(jsonParser.getText());
                 break;
             case JsonTokenId.ID_NUMBER_INT:
-                eventHandler.value(jsonParser.getIntValue());
+                final JsonParser.NumberType numberType = jsonParser.getNumberType();
+                final Number numberValue = jsonParser.getNumberValue();
+                if (numberType == JsonParser.NumberType.LONG) {
+                    eventHandler.value(numberValue.longValue());
+                } else {
+                    eventHandler.value(numberValue.intValue());
+                }
                 break;
             case JsonTokenId.ID_NUMBER_FLOAT:
                 eventHandler.value(jsonParser.getDoubleValue());
