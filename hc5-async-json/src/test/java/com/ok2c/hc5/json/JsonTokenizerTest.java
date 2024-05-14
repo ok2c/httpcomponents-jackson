@@ -116,6 +116,12 @@ public class JsonTokenizerTest {
                 JsonTokenId.ID_STRING,
                 JsonTokenId.ID_END_OBJECT,
                 JsonTokenId.ID_END_ARRAY,
+                JsonTokenId.ID_START_ARRAY,
+                JsonTokenId.ID_START_OBJECT,
+                JsonTokenId.ID_FIELD_NAME,
+                JsonTokenId.ID_NUMBER_INT,
+                JsonTokenId.ID_END_OBJECT,
+                JsonTokenId.ID_END_ARRAY,
                 JsonTokenId.ID_END_ARRAY,
                 JsonTokenId.ID_NO_TOKEN
         );
@@ -339,7 +345,7 @@ public class JsonTokenizerTest {
         Assertions.assertThat(resource2).isNotNull();
 
         URL resource3 = getClass().getResource("/sample3.json");
-        Assertions.assertThat(resource2).isNotNull();
+        Assertions.assertThat(resource3).isNotNull();
 
         for (int bufSize : new int[]{2048, 1024, 256, 32, 16, 8}) {
             List<Integer> tokens1 = new ArrayList<>();
@@ -428,6 +434,12 @@ public class JsonTokenizerTest {
                     JsonTokenId.ID_START_OBJECT,
                     JsonTokenId.ID_FIELD_NAME,
                     JsonTokenId.ID_STRING,
+                    JsonTokenId.ID_END_OBJECT,
+                    JsonTokenId.ID_END_ARRAY,
+                    JsonTokenId.ID_START_ARRAY,
+                    JsonTokenId.ID_START_OBJECT,
+                    JsonTokenId.ID_FIELD_NAME,
+                    JsonTokenId.ID_NUMBER_INT,
                     JsonTokenId.ID_END_OBJECT,
                     JsonTokenId.ID_END_ARRAY,
                     JsonTokenId.ID_END_ARRAY,

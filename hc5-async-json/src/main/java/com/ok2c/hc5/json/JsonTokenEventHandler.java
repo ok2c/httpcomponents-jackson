@@ -61,6 +61,11 @@ public interface JsonTokenEventHandler {
     void value(int value);
 
     /**
+     * Triggered to signal occurrence of a long value.
+     */
+    void value(long value);
+
+    /**
      * Triggered to signal occurrence of an double precision value.
      */
     void value(double value);

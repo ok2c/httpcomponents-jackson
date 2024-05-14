@@ -156,6 +156,17 @@ public final class JsonNodeAssembler implements JsonTokenEventHandler {
     }
 
     @Override
+    public void value(long value) {
+        if (currentObject instanceof ObjectNode) {
+            ((ObjectNode) currentObject).put(currentField, value);
+        } else if (currentObject instanceof ArrayNode) {
+            ((ArrayNode) currentObject).add(value);
+        } else {
+            throw new IllegalStateException("Unexpected node class: " + currentObject.getClass());
+        }
+    }
+
+    @Override
     public void value(double value) {
         if (currentObject instanceof ObjectNode) {
             ((ObjectNode) currentObject).put(currentField, value);
