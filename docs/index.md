@@ -22,7 +22,7 @@ The library is available in Maven Central with the following coordinates:
 <dependency>
   <groupId>com.github.ok2c.hc5</groupId>
   <artifactId>hc5-async-json</artifactId>
-  <version>0.3.0</version>
+  <version>0.4.0</version>
 </dependency>
 ```
 ## HTTP response message consumers
