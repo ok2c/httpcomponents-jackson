@@ -1,3 +1,17 @@
+Release 0.4.0
+-------------------
+
+This is a minor feature release that extends JsonTokenEventHandler with support for
+LONG values.
+
+* Upgraded HttpCore to version 5.2.4.
+
+* JsonTokenEventHandler now correctly handles LONG values (Fixes #14).
+  Contributed by Peter Fischer <pfischer at wikimedia.org>
+
+* Upgraded Jackson Databind to version 2.16.0
+
+
 Release 0.3.0
 -------------------
 
