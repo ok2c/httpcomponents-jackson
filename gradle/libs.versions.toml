@@ -1,7 +1,7 @@
 [versions]
-httpcore = "5.2.3"
+httpcore = "5.2.4"
 jackson = "2.16.0"
-httpclient = "5.2.1"
+httpclient = "5.3.1"
 slf4j = "1.7.36"
 junit = "5.10.1"
 junit-platform = "1.10.1"
