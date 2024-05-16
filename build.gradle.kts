@@ -1,6 +1,6 @@
 allprojects {
     group = "com.github.ok2c.hc5"
-    version = "0.3.1-SNAPSHOT"
+    version = "0.4.0"
 
     repositories {
         mavenCentral()
