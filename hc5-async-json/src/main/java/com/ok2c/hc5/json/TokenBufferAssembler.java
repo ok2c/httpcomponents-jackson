@@ -57,11 +57,7 @@ public final class TokenBufferAssembler implements JsonTokenConsumer {
             case JsonTokenId.ID_END_OBJECT:
             case JsonTokenId.ID_END_ARRAY:
                 depth--;
-                if (depth == 0) {
-                    buffer.close();
-                    sink.accept(buffer);
-                    buffer = new TokenBuffer(null, false);
-                }
+                processBufferIfNeeded();
                 break;
             case JsonTokenId.ID_NO_TOKEN:
                 if (!buffer.isClosed()) {
@@ -69,6 +65,16 @@ public final class TokenBufferAssembler implements JsonTokenConsumer {
                 }
                 sink.end();
                 break;
+            default:
+                processBufferIfNeeded();
+        }
+    }
+
+    private void processBufferIfNeeded() throws IOException {
+        if (depth == 0) {
+            buffer.close();
+            sink.accept(buffer);
+            buffer = new TokenBuffer(null, false);
         }
     }
 

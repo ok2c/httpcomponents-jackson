@@ -15,13 +15,17 @@
  */
 package com.ok2c.hc5.json;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,6 +36,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.util.TokenBuffer;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class JsonTokenBufferAssemblerTest {
 
@@ -316,4 +323,60 @@ public class JsonTokenBufferAssemblerTest {
         Assertions.assertThat(jsonNode3).isEqualTo((expectedObject3));
     }
 
+    @ParameterizedTest
+    @MethodSource
+    public void testTokenBufferSimpleStringAssembly( final String exampleString, final JsonNode expectedJsonNode ) throws Exception {
+        JsonFactory factory = new JsonFactory();
+        ObjectMapper objectMapper = new ObjectMapper(factory);
+        JsonAsyncTokenizer jsonTokenizer = new JsonAsyncTokenizer(factory);
+
+        AtomicInteger started = new AtomicInteger(0);
+        List<TokenBuffer> tokenBufferList = new ArrayList<>();
+        AtomicInteger ended = new AtomicInteger(0);
+        try (InputStream inputStream = new ByteArrayInputStream( exampleString.getBytes( StandardCharsets.UTF_8) ) ) {
+            jsonTokenizer.initialize(new TopLevelArrayTokenFilter(new TokenBufferAssembler(new JsonResultSink<TokenBuffer>() {
+
+                @Override
+                public void begin(int sizeHint) {
+                    started.incrementAndGet();
+                }
+
+                @Override
+                public void accept(TokenBuffer tokenBuffer) {
+                    tokenBufferList.add(tokenBuffer);
+                }
+
+                @Override
+                public void end() {
+                    ended.incrementAndGet();
+                }
+
+            })));
+            byte[] bytebuf = new byte[1024];
+            int len;
+            while ((len = inputStream.read(bytebuf)) != -1) {
+                jsonTokenizer.consume(ByteBuffer.wrap(bytebuf, 0, len));
+            }
+            jsonTokenizer.streamEnd();
+        }
+
+        Assertions.assertThat(tokenBufferList).hasSize(1);
+        Assertions.assertThat(started.get()).isEqualTo(1);
+        Assertions.assertThat(ended.get()).isEqualTo((1));
+
+        TokenBuffer tokenBuffer1 = tokenBufferList.get(0);
+        Assertions.assertThat(tokenBuffer1).isNotNull();
+        JsonNode jsonNode1 = objectMapper.readTree(tokenBuffer1.asParserOnFirstToken());
+
+        Assertions.assertThat(jsonNode1).isEqualTo( expectedJsonNode );
+    }
+
+    public static Stream<Arguments> testTokenBufferSimpleStringAssembly() {
+        return Stream.of( Arguments.of( "7.7", JsonNodeFactory.instance.numberNode( BigDecimal.valueOf( 7.7 ) ) ),
+                Arguments.of( "7", JsonNodeFactory.instance.numberNode(7 ) ),
+                Arguments.of( "\"RAW_VALUE\"", JsonNodeFactory.instance.textNode( "RAW_VALUE" ) ),
+                Arguments.of( "true", JsonNodeFactory.instance.booleanNode( true ) ),
+                Arguments.of( "false", JsonNodeFactory.instance.booleanNode( false ) ),
+                Arguments.of( "null", JsonNodeFactory.instance.nullNode() ) );
+    }
 }
